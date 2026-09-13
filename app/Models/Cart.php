@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CartStatus;
+use Carbon\CarbonInterface;
 use Database\Factories\CartFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -28,12 +30,12 @@ use Illuminate\Support\Carbon;
  * @property int $total
  * @property int|null $shipping_address_id
  * @property array<string, mixed>|null $metadata
- * @property Carbon|null $abandoned_completed_at
+ * @property CarbonInterface|null $abandoned_completed_at
  * @property int $abandoned_count
  * @property int|null $abandoned_last_interval
- * @property Carbon|null $abandoned_lastdate
- * @property Carbon|null $last_activity_at
- * @property Carbon|null $completed_at
+ * @property CarbonInterface|null $abandoned_lastdate
+ * @property CarbonInterface|null $last_activity_at
+ * @property CarbonInterface|null $completed_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -67,6 +69,16 @@ class Cart extends Model
         return 'public_id';
     }
 
+    public function isActive(): bool
+    {
+        return $this->status === CartStatus::Active;
+    }
+
+    public function itemCount(): int
+    {
+        return (int) $this->items->sum('quantity');
+    }
+
     /** @return BelongsTo<Customer, $this> */
     public function customer(): BelongsTo
     {
@@ -77,6 +89,12 @@ class Cart extends Model
     public function items(): HasMany
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    /** @return MorphMany<Address, $this> */
+    public function addresses(): MorphMany
+    {
+        return $this->morphMany(Address::class, 'addressable');
     }
 
     /** @return BelongsTo<Address, $this> */

@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Cart\Exceptions\CartException;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -29,4 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(fn (CartException $exception, Request $request) => response()->json([
+            'message' => $exception->getMessage(),
+        ], 422));
     })->create();

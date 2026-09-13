@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Product $product
+ * @property-read Product|null $product  Null si el producto fue borrado (soft delete).
  */
 #[Fillable(['product_id', 'sku', 'title', 'price', 'inventory_quantity', 'allow_backorder', 'manage_inventory', 'weight_kg', 'metadata'])]
 class ProductVariant extends Model

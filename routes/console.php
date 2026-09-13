@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Cart\Jobs\DetectAbandonedCartsJob;
 use App\Domain\ErpSync\Jobs\SyncImagesJob;
 use App\Domain\ErpSync\Jobs\SyncProductsJob;
 use Illuminate\Support\Facades\Schedule;
@@ -30,5 +31,12 @@ Schedule::job(new SyncImagesJob)
     ->withoutOverlapping(240)
     ->onOneServer()
     ->name('erp:sync-images');
+
+Schedule::job(new DetectAbandonedCartsJob)
+    ->everyFiveMinutes()
+    ->when(fn (): bool => (bool) config('shineray.abandoned_cart.enabled'))
+    ->withoutOverlapping(30)
+    ->onOneServer()
+    ->name('cart:detect-abandoned');
 
 Schedule::command('horizon:snapshot')->everyFiveMinutes();

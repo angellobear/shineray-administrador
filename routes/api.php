@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Store\CartController;
+use App\Http\Controllers\Store\CartDiscountController;
+use App\Http\Controllers\Store\CartItemController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\SearchController;
 use App\Http\Controllers\Store\StockController;
@@ -20,4 +23,15 @@ Route::prefix('store')->name('store.')->group(function (): void {
     Route::get('products/{product:handle}', [ProductController::class, 'show'])->name('products.show');
     Route::get('search', SearchController::class)->name('search');
     Route::post('stock', StockController::class)->middleware('throttle:60,1')->name('stock');
+
+    Route::prefix('carts')->name('carts.')->group(function (): void {
+        Route::post('/', [CartController::class, 'store'])->name('store');
+        Route::get('{cart}', [CartController::class, 'show'])->name('show');
+        Route::patch('{cart}', [CartController::class, 'update'])->name('update');
+        Route::post('{cart}/items', [CartItemController::class, 'store'])->name('items.store');
+        Route::patch('{cart}/items/{item}', [CartItemController::class, 'update'])->scopeBindings()->name('items.update');
+        Route::delete('{cart}/items/{item}', [CartItemController::class, 'destroy'])->scopeBindings()->name('items.destroy');
+        Route::post('{cart}/discounts', [CartDiscountController::class, 'store'])->name('discounts.store');
+        Route::delete('{cart}/discounts/{discount:code}', [CartDiscountController::class, 'destroy'])->name('discounts.destroy');
+    });
 });
