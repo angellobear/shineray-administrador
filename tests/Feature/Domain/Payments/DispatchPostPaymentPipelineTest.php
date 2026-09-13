@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Notifications\Jobs\SendOrderConfirmationJob;
 use App\Domain\Payments\Jobs\SaveInvoiceToErpJob;
 use App\Domain\Shipping\Jobs\CreateShipmentGuideJob;
 use App\Events\PaymentAuthorized;
@@ -14,5 +15,5 @@ test('a payment authorization chains the post-payment jobs', function () {
 
     PaymentAuthorized::dispatch($order, $payment);
 
-    Bus::assertChained([CreateShipmentGuideJob::class, SaveInvoiceToErpJob::class]);
+    Bus::assertChained([CreateShipmentGuideJob::class, SaveInvoiceToErpJob::class, SendOrderConfirmationJob::class]);
 });

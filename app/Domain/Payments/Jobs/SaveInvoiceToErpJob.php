@@ -5,6 +5,7 @@ namespace App\Domain\Payments\Jobs;
 use App\Domain\ErpSync\Contracts\ErpClientContract;
 use App\Domain\ErpSync\DTOs\ClientInfo;
 use App\Domain\ErpSync\Services\InvoicePayloadFactory;
+use App\Domain\Notifications\Jobs\SendOrderConfirmationJob;
 use App\Enums\Integration;
 use App\Enums\PaymentGateway;
 use App\Models\IntegrationLog;
@@ -33,6 +34,15 @@ class SaveInvoiceToErpJob implements ShouldQueue
         public Order $order,
         public Payment $payment,
     ) {}
+
+    /**
+     * Si la factura falla definitivamente, la cadena se corta: el correo de
+     * confirmación se despacha igual para no dejar al cliente sin aviso.
+     */
+    public function failed(?Throwable $exception): void
+    {
+        SendOrderConfirmationJob::dispatch($this->order);
+    }
 
     public function handle(ErpClientContract $erp, InvoicePayloadFactory $payloads): void
     {

@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Domain\Notifications\Jobs\SendOrderConfirmationJob;
 use App\Domain\Payments\Jobs\SaveInvoiceToErpJob;
 use App\Domain\Shipping\Jobs\CreateShipmentGuideJob;
 use App\Events\PaymentAuthorized;
@@ -28,6 +29,7 @@ class DispatchPostPaymentPipeline
         return [
             new CreateShipmentGuideJob($event->order),
             new SaveInvoiceToErpJob($event->order, $event->payment),
+            new SendOrderConfirmationJob($event->order),
         ];
     }
 }
