@@ -53,3 +53,4 @@ Schedule::job(new DetectAbandonedCartsJob)
     ->name('cart:detect-abandoned');
 
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
+Schedule::command('sanctum:prune-expired --hours=24')->daily();

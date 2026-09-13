@@ -48,10 +48,10 @@ Route::prefix('store')->name('store.')->group(function (): void {
     });
 
     Route::prefix('auth')->name('auth.')->group(function (): void {
-        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,1')->name('register');
-        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1')->name('login');
-        Route::post('forgot-password', [PasswordResetController::class, 'sendResetLink'])->middleware('throttle:5,1')->name('forgot-password');
-        Route::post('reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:5,1')->name('reset-password');
+        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:customer-auth')->name('register');
+        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:customer-auth')->name('login');
+        Route::post('forgot-password', [PasswordResetController::class, 'sendResetLink'])->middleware('throttle:customer-auth')->name('forgot-password');
+        Route::post('reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:customer-auth')->name('reset-password');
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('me', [AuthController::class, 'me'])->name('me');
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -59,7 +59,7 @@ Route::prefix('store')->name('store.')->group(function (): void {
     });
 
     Route::prefix('b2b')->name('b2b.')->group(function (): void {
-        Route::post('verify', ClientVerificationController::class)->middleware('throttle:5,1')->name('verify');
+        Route::post('verify', ClientVerificationController::class)->middleware('throttle:customer-auth')->name('verify');
         Route::middleware(['auth:sanctum', EnsureCustomerIsB2b::class])->group(function (): void {
             Route::get('address', [B2bAccountController::class, 'address'])->name('address');
             Route::get('installments', [B2bAccountController::class, 'installments'])->name('installments');
@@ -70,11 +70,11 @@ Route::prefix('store')->name('store.')->group(function (): void {
     });
 
     Route::prefix('orders')->name('orders.')->group(function (): void {
-        Route::get('{order}', [OrderController::class, 'show'])->name('show');
+        Route::get('{order}', [OrderController::class, 'show'])->middleware('throttle:store-lookup')->name('show');
         Route::post('{order}/complete', [CheckoutController::class, 'complete'])->middleware('throttle:20,1')->name('complete');
     });
 });
 
 Route::post('webhooks/deuna', DeunaWebhookController::class)
-    ->middleware([VerifyDeunaWebhook::class, 'throttle:120,1'])
+    ->middleware([VerifyDeunaWebhook::class, 'throttle:webhooks'])
     ->name('webhooks.deuna');
