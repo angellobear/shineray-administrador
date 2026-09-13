@@ -5,8 +5,10 @@ namespace App\Providers;
 use App\Domain\ErpSync\Clients\ShinerayErpClient;
 use App\Domain\ErpSync\Contracts\ErpClientContract;
 use App\Domain\Payments\Contracts\PaymentGatewayContract;
+use App\Domain\Payments\Gateways\CreditoB2bGateway;
+use App\Domain\Payments\Gateways\DatafastGateway;
+use App\Domain\Payments\Gateways\DeunaGateway;
 use App\Domain\Payments\Gateways\ManualPaymentGateway;
-use App\Domain\Payments\Gateways\UnconfiguredPaymentGateway;
 use App\Domain\Payments\Services\PaymentGatewayResolver;
 use App\Domain\Search\Contracts\SearchIndexerContract;
 use App\Domain\Search\Indexers\ScoutSearchIndexer;
@@ -34,11 +36,11 @@ class IntegrationsServiceProvider extends ServiceProvider
 
         $this->app->singleton(PaymentGatewayResolver::class, function (Container $app): PaymentGatewayResolver {
             return new PaymentGatewayResolver($app, [
-                PaymentGateway::Datafast->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::Datafast),
-                PaymentGateway::DatafastB2b->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::DatafastB2b),
-                PaymentGateway::Deuna->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::Deuna),
-                PaymentGateway::DeunaB2b->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::DeunaB2b),
-                PaymentGateway::CreditoB2b->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::CreditoB2b),
+                PaymentGateway::Datafast->value => fn () => new DatafastGateway($app->make(TaxCalculator::class), b2b: false),
+                PaymentGateway::DatafastB2b->value => fn () => new DatafastGateway($app->make(TaxCalculator::class), b2b: true),
+                PaymentGateway::Deuna->value => fn () => new DeunaGateway(b2b: false),
+                PaymentGateway::DeunaB2b->value => fn () => new DeunaGateway(b2b: true),
+                PaymentGateway::CreditoB2b->value => CreditoB2bGateway::class,
                 PaymentGateway::Manual->value => ManualPaymentGateway::class,
             ]);
         });

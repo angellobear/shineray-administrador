@@ -1,0 +1,1 @@
+{"id":"8ac7a4a08b2","paymentType":"DB","paymentBrand":"VISA","amount":"115.00","currency":"USD","result":{"code":"800.100.151","description":"transaction declined (invalid card)"},"timestamp":"2026-09-13 10:05:00+0000","ndc":"CHK123"}

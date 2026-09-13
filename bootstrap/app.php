@@ -2,6 +2,7 @@
 
 use App\Domain\Cart\Exceptions\CartException;
 use App\Domain\Payments\Exceptions\PaymentFailedException;
+use App\Domain\Payments\Exceptions\PaymentGatewayException;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -35,6 +36,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (CartException $exception, Request $request) => response()->json([
             'message' => $exception->getMessage(),
         ], 422));
+
+        $exceptions->render(fn (PaymentGatewayException $exception, Request $request) => response()->json([
+            'message' => $exception->getMessage(),
+        ], 502));
 
         $exceptions->render(fn (PaymentFailedException $exception, Request $request) => response()->json([
             'message' => $exception->getMessage(),

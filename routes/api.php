@@ -8,6 +8,8 @@ use App\Http\Controllers\Store\OrderController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\SearchController;
 use App\Http\Controllers\Store\StockController;
+use App\Http\Controllers\Webhooks\DeunaWebhookController;
+use App\Http\Middleware\VerifyDeunaWebhook;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,3 +45,7 @@ Route::prefix('store')->name('store.')->group(function (): void {
         Route::post('{order}/complete', [CheckoutController::class, 'complete'])->middleware('throttle:20,1')->name('complete');
     });
 });
+
+Route::post('webhooks/deuna', DeunaWebhookController::class)
+    ->middleware([VerifyDeunaWebhook::class, 'throttle:120,1'])
+    ->name('webhooks.deuna');
