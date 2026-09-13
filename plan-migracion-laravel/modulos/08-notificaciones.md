@@ -7,15 +7,15 @@
   Compila plantillas Handlebars desde disco (`SES_TEMPLATE_PATH`), mapea
   eventos a plantillas: `order.placed`, `customer.password_reset`,
   `user.password_reset`, `abandoned.cart`. Tiene:
-  - BCC hardcodeado a 4 direcciones internas en `order.placed` (líneas
-    ~21-26) — **mover a `.env`/config**, no hardcodear direcciones internas
-    en código.
-  - `resendNotification` con lógica de recompilación/parcheo de totales — 
-    confirmar si este flujo de reenvío manual desde el admin se sigue
-    necesitando antes de portarlo (puede ser una función de admin poco usada).
-  - Resuelve dependencias directo de `container` (`container.orderService`)
-    en vez de destructuring tipado — sin equivalente necesario en Laravel,
-    aquí simplemente se inyectan los modelos/servicios que se necesiten.
+    - BCC hardcodeado a 4 direcciones internas en `order.placed` (líneas
+      ~21-26) — **mover a `.env`/config**, no hardcodear direcciones internas
+      en código.
+    - `resendNotification` con lógica de recompilación/parcheo de totales —
+      confirmar si este flujo de reenvío manual desde el admin se sigue
+      necesitando antes de portarlo (puede ser una función de admin poco usada).
+    - Resuelve dependencias directo de `container` (`container.orderService`)
+      en vez de destructuring tipado — sin equivalente necesario en Laravel,
+      aquí simplemente se inyectan los modelos/servicios que se necesiten.
 - `src/subscribers/notification.ts` — suscribe `custom-ses` a los 3 eventos
   de arriba sobre el `NotificationService` core de Medusa.
 - `data/templates/*.hbs` — las plantillas Handlebars en sí

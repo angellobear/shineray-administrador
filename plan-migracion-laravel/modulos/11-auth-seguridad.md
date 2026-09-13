@@ -49,11 +49,11 @@ listadas aquí como checklist consolidado para no perder ninguna.
 ## Diseño de autenticación en Laravel
 
 - **Sanctum**, dos guards:
-  - `admin` — staff, protege todas las rutas `/api/admin/*` y el panel
-    Filament.
-  - `customer` — clientes B2C/B2B, protege `/api/store/*` que requieran
-    identidad (carrito propio, direcciones, cuotas B2B, etc.); las rutas de
-    catálogo/búsqueda pueden quedar públicas (equivalente a hoy).
+    - `admin` — staff, protege todas las rutas `/api/admin/*` y el panel
+      Filament.
+    - `customer` — clientes B2C/B2B, protege `/api/store/*` que requieran
+      identidad (carrito propio, direcciones, cuotas B2B, etc.); las rutas de
+      catálogo/búsqueda pueden quedar públicas (equivalente a hoy).
 - Webhooks externos (DeUna) se autentican por **firma/secreto compartido**
   verificado en middleware dedicado, nunca pidiendo un token de admin desde
   dentro del handler.

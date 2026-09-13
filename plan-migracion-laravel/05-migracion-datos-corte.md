@@ -18,21 +18,21 @@ se hace un **ETL de una sola pasada**.
    conexión principal de la app nueva) usando una segunda conexión de
    Eloquent apuntando al mismo Postgres pero con el `schema`/tablas viejas.
 2. **Transformación**: mapeo tabla por tabla:
-   - `product`/`product_variant` (Medusa) → `products`/`product_variants`
-     (nuevo) — cuidado con la forma de `metadata` (Medusa guarda jsonb,
-     mapeo debería ser casi directo).
-   - `cart` (con las 4 columnas `abandoned_*`) → `carts` — directo.
-   - `order`/`line_item` → `orders`/`order_items`.
-   - `customer` → `customers`.
-   - `client_b2b`, `policies_b2b`, `transportistas_b2b` → tablas homónimas
-     nuevas, **poblando las FKs que hoy no existen** (`client_b2b.customer_id`
-     buscando el customer por email; `policies_b2b.client_b2b_id` buscando
-     por el `cod_cliente` actual contra el `id_client` del nuevo
-     `client_b2b`).
-   - `onboarding_state` — opcional, ver `02-modelo-datos.md`.
-   - Historial de pagos: si se decide preservar el histórico de
-     `logs/payments.jsonl` (archivo local), importarlo a `payment_logs` como
-     parte del ETL, no descartarlo silenciosamente.
+    - `product`/`product_variant` (Medusa) → `products`/`product_variants`
+      (nuevo) — cuidado con la forma de `metadata` (Medusa guarda jsonb,
+      mapeo debería ser casi directo).
+    - `cart` (con las 4 columnas `abandoned_*`) → `carts` — directo.
+    - `order`/`line_item` → `orders`/`order_items`.
+    - `customer` → `customers`.
+    - `client_b2b`, `policies_b2b`, `transportistas_b2b` → tablas homónimas
+      nuevas, **poblando las FKs que hoy no existen** (`client_b2b.customer_id`
+      buscando el customer por email; `policies_b2b.client_b2b_id` buscando
+      por el `cod_cliente` actual contra el `id_client` del nuevo
+      `client_b2b`).
+    - `onboarding_state` — opcional, ver `02-modelo-datos.md`.
+    - Historial de pagos: si se decide preservar el histórico de
+      `logs/payments.jsonl` (archivo local), importarlo a `payment_logs` como
+      parte del ETL, no descartarlo silenciosamente.
 3. **Carga**: inserciones en lote (`insert()` masivo, no `save()` uno por
    uno) dentro de `DB::transaction()` por tabla, con validación de conteo
    final (comparar `count()` origen vs. destino) antes de considerar cada

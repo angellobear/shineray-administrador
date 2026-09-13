@@ -6,24 +6,24 @@
   los crea/actualiza en Medusa vía **su propia API HTTP admin** (`axios`
   contra `MEDUSA_URL_BACK`), no vía servicios inyectados. Contiene reglas de
   negocio importantes:
-  - Línea ~26-28: dedup por `COD_PRODUCTO` cuando el mismo producto viene en
-    varias bodegas/modelos — "primera fila gana".
-  - Línea ~34: `shouldSoftDelete = uniqueProducts.length >= 50` — guarda de
-    seguridad para no marcar todo como `draft` si el ERP devuelve una
-    respuesta vacía/corrupta.
-  - Líneas ~107-108: `allow_backorder: true, manage_inventory: true` en cada
-    variante — **regla de negocio crítica**, no un descuido. Existe un test
-    dedicado en el repo Node (`src/utils/jobs/__tests__/allow-backorder.spec.ts`)
-    que documenta por qué: si `allow_backorder` es `false`, `confirmInventory()`
-    de Medusa puede rechazar el checkout con 409 **después** de que el
-    payment processor ya cobró y ya facturó en el ERP — el stock real lo
-    controla el ERP externo, no Medusa. **Esta regla debe preservarse
-    explícitamente en Laravel**: el checkout nunca debe bloquear por stock
-    local: `product_variants.manage_inventory` puede incluso omitirse del
-    todo si se decide no llevar control de inventario local en absoluto (a
-    decidir en este módulo).
-  - Líneas ~144-163: soft-delete = poner `status: "draft"` a productos
-    publicados que ya no vinieron en el feed del ERP.
+    - Línea ~26-28: dedup por `COD_PRODUCTO` cuando el mismo producto viene en
+      varias bodegas/modelos — "primera fila gana".
+    - Línea ~34: `shouldSoftDelete = uniqueProducts.length >= 50` — guarda de
+      seguridad para no marcar todo como `draft` si el ERP devuelve una
+      respuesta vacía/corrupta.
+    - Líneas ~107-108: `allow_backorder: true, manage_inventory: true` en cada
+      variante — **regla de negocio crítica**, no un descuido. Existe un test
+      dedicado en el repo Node (`src/utils/jobs/__tests__/allow-backorder.spec.ts`)
+      que documenta por qué: si `allow_backorder` es `false`, `confirmInventory()`
+      de Medusa puede rechazar el checkout con 409 **después** de que el
+      payment processor ya cobró y ya facturó en el ERP — el stock real lo
+      controla el ERP externo, no Medusa. **Esta regla debe preservarse
+      explícitamente en Laravel**: el checkout nunca debe bloquear por stock
+      local: `product_variants.manage_inventory` puede incluso omitirse del
+      todo si se decide no llevar control de inventario local en absoluto (a
+      decidir en este módulo).
+    - Líneas ~144-163: soft-delete = poner `status: "draft"` a productos
+      publicados que ya no vinieron en el feed del ERP.
 - `src/utils/jobs/shineray-api.js` (352 líneas) — cliente HTTP del ERP para
   catálogo: obtención de token, `getTransformedDataShineray()` (transforma
   filas del ERP a la forma de producto que espera la API de Medusa),

@@ -14,6 +14,7 @@ filtrar volumen de negocio (a decidir por tabla si aplica).
 ## Catálogo
 
 **`products`**
+
 - `id`, `title`, `description` (text), `handle` (slug único), `thumbnail`
   (url), `status` (enum: `draft`,`published`)
 - `metadata` (jsonb) — campos ricos del ERP: `codigo_marca`, `moto_modelo`,
@@ -28,17 +29,18 @@ filtrar volumen de negocio (a decidir por tabla si aplica).
   "draft" por compatibilidad con el filtro de Meilisearch/frontend).
 
 **`product_variants`**
+
 - `id`, `product_id` FK, `sku` (único, es el `COD_PRODUCTO` del ERP),
   `title`, `price` (integer, centavos, USD), `inventory_quantity` (integer),
   `allow_backorder` (boolean, default `true` — ver nota de negocio abajo),
   `manage_inventory` (boolean, default `true`), `weight` (decimal, kg)
 
-  > **Nota de negocio a preservar**: en el código actual, `allow_backorder:
-  > true` es deliberado, no un descuido — evita que el checkout rechace una
-  > orden por falta de stock local cuando el stock real lo controla el ERP
-  > externo. Ver `modulos/01-productos-catalogo.md` y
-  > `modulos/09-erp-sync.md` para el detalle completo y la regla de negocio
-  > que depende de esto (evitar el caso "se cobró pero no se creó la orden").
+    > **Nota de negocio a preservar**: en el código actual, `allow_backorder:
+true` es deliberado, no un descuido — evita que el checkout rechace una
+    > orden por falta de stock local cuando el stock real lo controla el ERP
+    > externo. Ver `modulos/01-productos-catalogo.md` y
+    > `modulos/09-erp-sync.md` para el detalle completo y la regla de negocio
+    > que depende de esto (evitar el caso "se cobró pero no se creó la orden").
 
 **`product_options`** / **`product_variant_options`** — solo si el catálogo de
 motopartes realmente necesita variantes con opciones (color/talla). A
@@ -48,6 +50,7 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
 ## Carrito
 
 **`carts`**
+
 - `id`, `customer_id` FK nullable (carrito de invitado permitido),
   `email`, `status` (enum: `active`,`completed`,`abandoned`),
   `subtotal`, `shipping_total`, `tax_total`, `discount_total`, `total`
@@ -60,12 +63,14 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
   `abandoned_lastdate` (timestamp nullable)
 
 **`cart_items`**
+
 - `id`, `cart_id` FK, `product_variant_id` FK, `quantity`,
   `unit_price` (snapshot al momento de agregar, no recalculado del producto)
 
 ## Órdenes
 
 **`orders`**
+
 - `id`, `order_number` (único, visible al cliente), `cart_id` FK nullable,
   `customer_id` FK, `status` (enum: `pending`,`paid`,`fulfilled`,`canceled`,
   `refunded`), `subtotal`, `shipping_total`, `tax_total`, `discount_total`,
@@ -75,12 +80,14 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
   para B2B también `transportista_id`, `numero_cuota`, `cod_client`, `ruc`)
 
 **`order_items`**
+
 - `id`, `order_id` FK, `product_variant_id` FK, `quantity`, `unit_price`,
   `title` (snapshot del nombre del producto al momento de la compra)
 
 ## Direcciones
 
 **`addresses`**
+
 - `id`, `addressable_type`/`addressable_id` (polimórfica: cart, order,
   customer), `first_name`, `last_name`, `phone`, `address_1`, `city`,
   `province`, `country_code` (fijo `EC`), `postal_code` (default `"000000"`
@@ -91,6 +98,7 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
 ## Clientes
 
 **`customers`**
+
 - `id`, `email` (único), `password` (nullable si el flujo B2B autocreación
   sigue existiendo — ver `modulos/06-b2b.md` para la decisión de si se
   mantiene un password compartido o se fuerza reset individual, **corrigiendo**
@@ -100,6 +108,7 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
 ## B2B
 
 **`client_b2b`**
+
 - `id`, `customer_id` FK **nullable pero recomendado poblarlo siempre**
   (corrige la falta de relación real que existe hoy entre `ClientB2b` y
   `Customer`, que hoy se resuelve en runtime por email), `id_client` (código
@@ -107,21 +116,24 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
   `phone_number`, `email`, `address` (jsonb), `active` (boolean)
 
 **`policies_b2b`** (implementada como `b2b_policies`)
+
 - `id`, `client_b2b_id` FK (**corrige** el `cod_cliente varchar` suelto de
   hoy, que no es una FK real), `es_activo` (boolean), `factor_credito`
   (decimal), `num_cuotas` (integer)
-- **Corrección verificada**: `cod_cliente`/`COD_CLIENTEH` es el *tipo* de
+- **Corrección verificada**: `cod_cliente`/`COD_CLIENTEH` es el _tipo_ de
   cliente (`type_client`, ej. `DM`), no un cliente. Implementado como
   `b2b_policies(client_type, is_active, credit_factor, installments)` con único
   `(client_type, installments)` y sin FK a clientes; `B2bClient` resuelve sus
   políticas por `type_client` (alias `DI → DM`). Ver `07-verificacion-codigo.md`.
 
 **`transportistas_b2b`**
+
 - `id`, `razon_social`, `ruc`
 
 ## Pagos
 
 **`payments`**
+
 - `id`, `order_id` FK, `gateway` (enum: `datafast`,`datafast_b2b`,`deuna`,
   `deuna_b2b`,`credito_b2b`), `status` (enum: `pending`,`authorized`,
   `captured`,`failed`,`refunded`,`canceled`), `amount` (integer, centavos),
@@ -130,6 +142,7 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
   nullable)
 
 **`payment_logs`**
+
 - `id`, `payment_id` FK nullable, `gateway`, `event` (string —
   `servientrega_fail`, `invoice_fail`, etc., mismo vocabulario que el logger
   actual), `payload` (jsonb), `created_at`
@@ -140,6 +153,7 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
 ## Envíos
 
 **`shipments`**
+
 - `id`, `order_id` FK, `provider` (enum: `servientrega`), `guide_number`
   (string, nullable — `null` explícito en vez del string `"000000"` actual
   cuando no hay guía; ver `modulos/05-envios-servientrega.md`), `status`
@@ -149,6 +163,7 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
 ## Descuentos
 
 **`discounts`**
+
 - `id`, `code` (único), `type` (enum: `percentage`,`fixed`,`free_shipping`),
   `value` (integer — porcentaje o centavos según `type`), `is_active`
   (boolean), fechas de vigencia si aplica

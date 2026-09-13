@@ -1,1 +1,19 @@
-{"id":"8ac7a4a08b1","paymentType":"DB","paymentBrand":"VISA","amount":"115.00","currency":"USD","descriptor":"1234.5678.9012 Shineray","result":{"code":"000.000.000","description":"Transaction succeeded"},"card":{"bin":"411111","last4Digits":"1111","holder":"ANA PEREZ","expiryMonth":"12","expiryYear":"2030"},"customer":{"givenName":"Ana","surname":"Perez"},"timestamp":"2026-09-13 10:05:00+0000","ndc":"CHK123"}
+{
+    "id": "8ac7a4a08b1",
+    "paymentType": "DB",
+    "paymentBrand": "VISA",
+    "amount": "115.00",
+    "currency": "USD",
+    "descriptor": "1234.5678.9012 Shineray",
+    "result": { "code": "000.000.000", "description": "Transaction succeeded" },
+    "card": {
+        "bin": "411111",
+        "last4Digits": "1111",
+        "holder": "ANA PEREZ",
+        "expiryMonth": "12",
+        "expiryYear": "2030"
+    },
+    "customer": { "givenName": "Ana", "surname": "Perez" },
+    "timestamp": "2026-09-13 10:05:00+0000",
+    "ndc": "CHK123"
+}

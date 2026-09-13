@@ -6,9 +6,9 @@ Este es el plan de migración completa del backend de e-commerce de Shineray Ecu
 desde el Medusa v1 actual (Node/TypeScript/TypeORM) hacia un backend Laravel
 construido a medida — **no** una réplica de la arquitectura de Medusa (sin su
 sistema de módulos/plugins, sin multi-región, sin motor de workflows). Se toma
-Medusa como *referencia de dominio* (qué conceptos existen: producto, variante,
-carrito, orden, carrito abandonado, cliente B2B, etc.) y como *especificación
-funcional* de lo que ya funciona en producción (integraciones con Datafast,
+Medusa como _referencia de dominio_ (qué conceptos existen: producto, variante,
+carrito, orden, carrito abandonado, cliente B2B, etc.) y como _especificación
+funcional_ de lo que ya funciona en producción (integraciones con Datafast,
 Servientrega, el ERP Shineray/Massline). No es una migración automática de
 código: es una reescritura completa, informada por una auditoría línea por
 línea del código Node actual.
@@ -24,6 +24,7 @@ línea del código Node actual.
 
 **Regla para cualquier agente que trabaje en un módulo**: no cargues los dos
 repos completos en contexto. Para implementar un módulo:
+
 1. Lee este archivo (`00-lineamientos.md`) una sola vez, al empezar.
 2. Lee el archivo del módulo específico en `plan-migracion-laravel/modulos/`.
 3. Abre **solo** los archivos de referencia que ese módulo lista explícitamente
@@ -86,6 +87,7 @@ son suposiciones.
 Estas ya se identificaron en la auditoría del código Node como comportamientos
 ambiguos. **No se deben resolver "a criterio del agente"** al portar — cada
 módulo las señala en su sección "Decisiones pendientes":
+
 - Servientrega tiene dos endpoints/credenciales de creación de guía distintos
   y activos simultáneamente en el código actual — hay que confirmar cuál es
   el real con el proveedor antes de implementar el nuevo cliente.

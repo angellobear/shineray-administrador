@@ -97,7 +97,7 @@ config/
 ```
 
 Regla: un Controller nunca llama directo a un Gateway/Provider/Client — llama
-a un método de un Service del dominio, que a su vez depende del *contrato*
+a un método de un Service del dominio, que a su vez depende del _contrato_
 (interfaz), nunca de la clase concreta. El binding contrato→implementación
 concreta se declara en un `ServiceProvider` (`AppServiceProvider` o uno
 dedicado, `IntegrationsServiceProvider`).
@@ -157,23 +157,23 @@ construir encima.
 1. **Panel de administración en Inertia + React, no Filament.** El repo se
    scaffoldeó con Inertia React, shadcn/ui, Tailwind 4 y Fortify (login, 2FA,
    passkeys). Meter Filament añadiría una segunda stack de frontend (Livewire
-   + Blade) al mismo proyecto. El admin se construye con las mismas páginas
-   React del starter, apoyándose en paquetes para no partir de cero:
-   `@tanstack/react-table` para tablas/filtros, `spatie/laravel-query-builder`
-   para listados filtrables por URL, exportación CSV con `league/csv`, y
-   `spatie/laravel-permission` solo si se necesitan roles de staff.
-   Costo aceptado: más trabajo manual que Filament en CRUDs simples.
+    - Blade) al mismo proyecto. El admin se construye con las mismas páginas
+      React del starter, apoyándose en paquetes para no partir de cero:
+      `@tanstack/react-table` para tablas/filtros, `spatie/laravel-query-builder`
+      para listados filtrables por URL, exportación CSV con `league/csv`, y
+      `spatie/laravel-permission` solo si se necesitan roles de staff.
+      Costo aceptado: más trabajo manual que Filament en CRUDs simples.
 2. **Modelos Eloquent en `app/Models` (planos), dominio en `app/Domain`.**
    Los modelos son compartidos entre dominios (una `Order` la usan Pagos,
    Envíos, Notificaciones y ERP), y toda la tooling de Laravel (`make:model`,
    factories, Boost, Fortify, Wayfinder) asume `app/Models`. Lo que sí vive
    por dominio es el comportamiento: `app/Domain/<Dominio>/{Contracts, DTOs,
-   Services, Gateways|Providers|Clients, Jobs}`. Eventos y listeners en
+Services, Gateways|Providers|Clients, Jobs}`. Eventos y listeners en
    `app/Events` / `app/Listeners`. Enums en `app/Enums`.
 3. **Dos modelos de identidad: `User` (staff) y `Customer` (clientes).**
    `User` + Fortify + guard `web` para el panel; `Customer` + guard `customer`
-   + Sanctum (cookie SPA o token) para el storefront Next.js. Broker de
-   password reset separado (`customer_password_reset_tokens`).
+    - Sanctum (cookie SPA o token) para el storefront Next.js. Broker de
+      password reset separado (`customer_password_reset_tokens`).
 4. **`integration_logs` en vez de `payment_logs`.** Una sola tabla polimórfica
    (`loggable` → Payment/Order/Shipment) etiquetada por `integration`
    (datafast, deuna, servientrega, shineray_erp, meilisearch) y `event`.

@@ -23,6 +23,7 @@ desde el día 1 porque bloquean las fases 4 y 5.
 
 Depende de: Fase 0. Ver `modulos/01-productos-catalogo.md`,
 `modulos/07-busqueda-meilisearch.md`.
+
 - Modelos `Product`/`ProductVariant`.
 - `ShinerayErpClient::fetchProducts()` + `SyncProductsJob` (con
   `DB::transaction()`, preservando `allow_backorder`).
@@ -33,12 +34,14 @@ Depende de: Fase 0. Ver `modulos/01-productos-catalogo.md`,
 ## Fase 2 — Carrito + carrito abandonado (1-2 semanas)
 
 Depende de: Fase 1. Ver `modulos/02-carrito-abandonado.md`.
+
 - Modelos `Cart`/`CartItem`, endpoints de storefront para armar carrito.
 - `DetectAbandonedCartsJob` + email de recuperación.
 
 ## Fase 3 — Órdenes/checkout (esqueleto sin pago real) (1 semana)
 
 Depende de: Fase 2. Ver `modulos/03-ordenes-checkout.md`.
+
 - `CheckoutService`, modelos `Order`/`OrderItem`, transición de estados,
   evento `PaymentAuthorized` ya declarado (sin listeners reales todavía).
 - Aquí se puede probar el flujo completo con un gateway "fake"/manual antes
@@ -47,8 +50,9 @@ Depende de: Fase 2. Ver `modulos/03-ordenes-checkout.md`.
 
 ## Fase 4 — Pagos (Datafast → DeUna → Crédito B2B) (4-6 semanas)
 
-Depende de: Fase 3. **Bloqueada por credenciales de sandbox reales** — 
+Depende de: Fase 3. **Bloqueada por credenciales de sandbox reales** —
 gestionar en paralelo desde la Fase 0. Ver `modulos/04-pagos.md`.
+
 - Empezar por Datafast B2C (el más completo/documentado), luego replicar el
   patrón para B2B y DeUna (más rápido, ya con el patrón establecido).
 - Crédito B2B al final (no depende de pasarela externa, es el más simple de
@@ -66,6 +70,7 @@ decisión pendiente de mayor impacto en el cronograma. Ver
 ## Fase 6 — B2B completo (2-3 semanas)
 
 Depende de: Fases 1, 3, 4 (crédito B2B). Ver `modulos/06-b2b.md`.
+
 - Modelos y relaciones `ClientB2b`/`PolicyB2b`/`TransportistaB2b`.
 - Sync jobs B2B (`modulos/09-erp-sync.md`) con transacciones reales.
 - Flujo de verificación/creación de cliente B2B (con la decisión de

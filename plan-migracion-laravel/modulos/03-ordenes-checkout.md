@@ -6,6 +6,7 @@ No hay un archivo único de "checkout" en el código Node — el flujo vive
 repartido entre el core de Medusa (que no se audita aquí, es comportamiento
 estándar de framework) y los payment processors, que son los que de verdad
 definen qué pasa al confirmar una orden:
+
 - `src/services/datafast-payment-processor.ts` — método `authorizePayment`,
   líneas ~424-769. Ver `modulos/04-pagos.md` para el detalle completo.
 - `src/services/deuna-payment-processor.ts` — equivalente para DeUna.
@@ -13,6 +14,7 @@ definen qué pasa al confirmar una orden:
   pasarela externa.
 
 El patrón a extraer de estos archivos (no el código en sí, la **secuencia**):
+
 1. Validar pago con el gateway.
 2. Crear guía de envío (Servientrega) — con tolerancia a fallo.
 3. Actualizar datos de envío en la orden/carrito.
@@ -28,15 +30,15 @@ El patrón a extraer de estos archivos (no el código en sí, la **secuencia**):
 ## Diseño en Laravel
 
 - `app/Domain/Orders/Services/CheckoutService.php` — orquesta:
-  1. Congela el carrito en una orden (`cart_id` → nueva fila en `orders` +
-     copia de `cart_items` a `order_items` con snapshot de precio).
-  2. Llama al `PaymentGatewayContract` correspondiente para `authorize()`.
-  3. Si el pago es exitoso, marca la orden `paid` y dispara
-     `event(new PaymentAuthorized($order, $payment))`.
-  4. Los listeners de ese evento (en cola, ver `01-arquitectura.md`) se
-     encargan de guía + factura + notificación — **no** el `CheckoutService`
-     directamente. Esto es lo que reemplaza el acoplamiento actual dentro del
-     payment processor.
+    1. Congela el carrito en una orden (`cart_id` → nueva fila en `orders` +
+       copia de `cart_items` a `order_items` con snapshot de precio).
+    2. Llama al `PaymentGatewayContract` correspondiente para `authorize()`.
+    3. Si el pago es exitoso, marca la orden `paid` y dispara
+       `event(new PaymentAuthorized($order, $payment))`.
+    4. Los listeners de ese evento (en cola, ver `01-arquitectura.md`) se
+       encargan de guía + factura + notificación — **no** el `CheckoutService`
+       directamente. Esto es lo que reemplaza el acoplamiento actual dentro del
+       payment processor.
 - El estado de la orden (`pending`,`paid`,`fulfilled`,`canceled`,`refunded`)
   se modela como enum simple + eventos de transición
   (`OrderPlaced`,`OrderFulfilled`,`OrderCanceled`), no como una máquina de

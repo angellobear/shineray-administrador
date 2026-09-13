@@ -19,17 +19,17 @@
 
 - **Filament** como panel de administración completo, no una reconstrucción
   de cada endpoint uno por uno:
-  - `ProductResource`, `OrderResource`, `CustomerResource`,
-    `ClientB2bResource`, `PolicyB2bResource`, `TransportistaB2bResource` —
-    CRUD generado sobre Eloquent, con las relaciones ya definidas en
-    `02-modelo-datos.md`.
-  - Página custom "Carritos abandonados" con acción "Reenviar email" —
-    equivalente a `admin/abandoned-cart`.
-  - Exportación de órdenes a CSV — Filament trae exportación de tablas de
-    forma nativa (`ExportAction`), probablemente cubre el caso de uso de
-    `custom-order-export-strategy.ts` sin código custom.
-  - Página/wizard de onboarding — solo si se decide mantenerlo (ver
-    `02-modelo-datos.md`, es la pieza de menor prioridad de todo el sistema).
+    - `ProductResource`, `OrderResource`, `CustomerResource`,
+      `ClientB2bResource`, `PolicyB2bResource`, `TransportistaB2bResource` —
+      CRUD generado sobre Eloquent, con las relaciones ya definidas en
+      `02-modelo-datos.md`.
+    - Página custom "Carritos abandonados" con acción "Reenviar email" —
+      equivalente a `admin/abandoned-cart`.
+    - Exportación de órdenes a CSV — Filament trae exportación de tablas de
+      forma nativa (`ExportAction`), probablemente cubre el caso de uso de
+      `custom-order-export-strategy.ts` sin código custom.
+    - Página/wizard de onboarding — solo si se decide mantenerlo (ver
+      `02-modelo-datos.md`, es la pieza de menor prioridad de todo el sistema).
 - El acceso al panel usa el guard `admin` de Sanctum/sesión de Laravel
   (Filament ya trae su propio sistema de autenticación integrado con los
   guards de Laravel) — reemplaza la auth admin de Medusa sin trabajo extra.

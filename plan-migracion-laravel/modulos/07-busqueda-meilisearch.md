@@ -7,14 +7,14 @@
   (incluye el custom `hasStock:desc` primero), `displayedAttributes`,
   `filterableAttributes`, `sortableAttributes`, y el `transformer` (líneas
   150-216) que:
-  - Excluye productos no `published` salvo `MEILISEARCH_ALLOW_DRAFTS=true`.
-  - Deriva `nombreSubsistema` con prioridad: `NIVEL_3` real → `NOMBRE_SUBSISTEMA`
-    → función `deriveSubsistema(categoria)` (fallback por palabras clave de
-    categoría, líneas 155-178) — **portar el fallback completo**, es
-    lógica de negocio real usada porque el ERP no siempre manda
-    `NOMBRE_SUBSISTEMA`.
-  - `hasStock: product.variants[0].inventory_quantity > 0`.
-  - `isB2b`, `isLandingPromo`, `OldPrice` desde `metadata`.
+    - Excluye productos no `published` salvo `MEILISEARCH_ALLOW_DRAFTS=true`.
+    - Deriva `nombreSubsistema` con prioridad: `NIVEL_3` real → `NOMBRE_SUBSISTEMA`
+      → función `deriveSubsistema(categoria)` (fallback por palabras clave de
+      categoría, líneas 155-178) — **portar el fallback completo**, es
+      lógica de negocio real usada porque el ERP no siempre manda
+      `NOMBRE_SUBSISTEMA`.
+    - `hasStock: product.variants[0].inventory_quantity > 0`.
+    - `isB2b`, `isLandingPromo`, `OldPrice` desde `metadata`.
 - `src/subscribers/meilisearch-cleanup.ts` (91 líneas) — limpia del índice
   productos que ya no están `published` en Postgres, con espera activa
   (`waitForMeiliTasks`, hasta 120s) a que terminen las tareas de indexado

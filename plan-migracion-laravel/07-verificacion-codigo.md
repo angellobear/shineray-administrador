@@ -9,15 +9,15 @@ qué cambió en el código Laravel como consecuencia.
 
 El plan es fiel al código en lo estructural. Las correcciones importantes:
 
-| Tema | Plan decía | Código real | Acción |
-| --- | --- | --- | --- |
-| Políticas B2B | `ClientB2b hasOne PolicyB2b` con FK | `COD_CLIENTEH` es el **tipo** de cliente (`type_client`, ej. `DM`), no el cliente; `get-cuota-b2b` consulta por tipo con alias `DI → DM`; `cuotas_info[]` trae una política por número de cuotas | `b2b_policies(client_type, installments)` sin FK a clientes; `B2bClient::activePolicies()` resuelve el alias |
-| Carrito abandonado | "portar los intervalos reales" | `options_.intervals = []` hardcodeado y el constructor ignora las opciones del plugin: **el cron sale sin hacer nada**; solo funciona el envío manual desde el admin | Config `intervals_minutes` vacío por defecto + decisión de negocio pendiente |
-| Precio ERP | `round(PRECIO/1.15*100)` | `round(round(round(PRECIO,2)/1.15,2)*100)` (doble redondeo) | `TaxCalculator::erpGrossPriceToNetCents` replica la cadena exacta |
-| Cotización Servientrega | flete → centavos | flete → centavos **+ 15% IVA** (`valorFinalAddIva`), timeout 6 s, fallback $5.00 sin log | `shipping.quote.add_iva = true` |
-| Metadata de producto | se guarda tal cual | el sync **sobrescribe** `metadata` con las claves del ERP; `is_b2b`, `IS_PROMO`, `OLD_PRICE`, `ID_ITEM_NS` se editan a mano en el admin y sobreviven porque Medusa hace merge | `SyncProductsJob` debe hacer merge de metadata, nunca reemplazar |
-| Check de stock | 1 llamada por producto | 1 llamada **y 1 token** por producto (~7 000 pares de requests por sync) | El endpoint acepta un array: hacer batch y cachear token |
-| Clientes ERP | 3 clientes HTTP | **4** (`src/api/utils/shineray-api.js` también obtiene token) | Sin cambio: ya se unifica en `ErpClientContract` |
+| Tema                    | Plan decía                          | Código real                                                                                                                                                                                      | Acción                                                                                                       |
+| ----------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Políticas B2B           | `ClientB2b hasOne PolicyB2b` con FK | `COD_CLIENTEH` es el **tipo** de cliente (`type_client`, ej. `DM`), no el cliente; `get-cuota-b2b` consulta por tipo con alias `DI → DM`; `cuotas_info[]` trae una política por número de cuotas | `b2b_policies(client_type, installments)` sin FK a clientes; `B2bClient::activePolicies()` resuelve el alias |
+| Carrito abandonado      | "portar los intervalos reales"      | `options_.intervals = []` hardcodeado y el constructor ignora las opciones del plugin: **el cron sale sin hacer nada**; solo funciona el envío manual desde el admin                             | Config `intervals_minutes` vacío por defecto + decisión de negocio pendiente                                 |
+| Precio ERP              | `round(PRECIO/1.15*100)`            | `round(round(round(PRECIO,2)/1.15,2)*100)` (doble redondeo)                                                                                                                                      | `TaxCalculator::erpGrossPriceToNetCents` replica la cadena exacta                                            |
+| Cotización Servientrega | flete → centavos                    | flete → centavos **+ 15% IVA** (`valorFinalAddIva`), timeout 6 s, fallback $5.00 sin log                                                                                                         | `shipping.quote.add_iva = true`                                                                              |
+| Metadata de producto    | se guarda tal cual                  | el sync **sobrescribe** `metadata` con las claves del ERP; `is_b2b`, `IS_PROMO`, `OLD_PRICE`, `ID_ITEM_NS` se editan a mano en el admin y sobreviven porque Medusa hace merge                    | `SyncProductsJob` debe hacer merge de metadata, nunca reemplazar                                             |
+| Check de stock          | 1 llamada por producto              | 1 llamada **y 1 token** por producto (~7 000 pares de requests por sync)                                                                                                                         | El endpoint acepta un array: hacer batch y cachear token                                                     |
+| Clientes ERP            | 3 clientes HTTP                     | **4** (`src/api/utils/shineray-api.js` también obtiene token)                                                                                                                                    | Sin cambio: ya se unifica en `ErpClientContract`                                                             |
 
 ## Módulo 01 / 09 — Catálogo y sync (verificado)
 
@@ -27,18 +27,18 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 - Cron `30 6,10,12,14,17 * * *` (productos) y `0 6,10,12,14,17 * * *`
   (imágenes). **Confirmado.**
 - Forma del producto (`transformJsonMedusa`):
-  - `handle = slug(NOMBRE_PRODUCTO + "-" + COD_PRODUCTO)`.
-  - `thumbnail = https://shineray-public.s3.amazonaws.com/repuestos/{COD}.jpg`;
-    el job de imágenes descarga de `{ERP}/imageApi/img?code={COD}` y sube a S3
-    con reintentos (3) y validación de `Content-Length`.
-  - `weight = PESO ? round(PESO) : 1` (unidad sin documentar; ver Servientrega).
-  - `metadata` con claves **en mayúsculas del ERP** (`COD_PRODUCTO`,
-    `CODIGO_MARCA`, `NOMBRE_CATEGORIA`, `NIVEL_1..4`, `COD_NIVEL_1..4`,
-    `ANIO_DESDE/HASTA`, `MOTO_MODELO`, `CODIGO_MODELO_MOTO`, `NOMBRE_BODEGA`,
-    `COD_AGENCIA`, `ICE`, `IVA`, `CONTROL_BUFFER`, `COD_UNIDAD`). El
-    transformer de Meilisearch lee exactamente estas claves: **mantenerlas
-    idénticas** en `products.metadata` para no romper el frontend.
-  - `inventory_quantity = checkStock(COD).available`.
+    - `handle = slug(NOMBRE_PRODUCTO + "-" + COD_PRODUCTO)`.
+    - `thumbnail = https://shineray-public.s3.amazonaws.com/repuestos/{COD}.jpg`;
+      el job de imágenes descarga de `{ERP}/imageApi/img?code={COD}` y sube a S3
+      con reintentos (3) y validación de `Content-Length`.
+    - `weight = PESO ? round(PESO) : 1` (unidad sin documentar; ver Servientrega).
+    - `metadata` con claves **en mayúsculas del ERP** (`COD_PRODUCTO`,
+      `CODIGO_MARCA`, `NOMBRE_CATEGORIA`, `NIVEL_1..4`, `COD_NIVEL_1..4`,
+      `ANIO_DESDE/HASTA`, `MOTO_MODELO`, `CODIGO_MODELO_MOTO`, `NOMBRE_BODEGA`,
+      `COD_AGENCIA`, `ICE`, `IVA`, `CONTROL_BUFFER`, `COD_UNIDAD`). El
+      transformer de Meilisearch lee exactamente estas claves: **mantenerlas
+      idénticas** en `products.metadata` para no romper el frontend.
+    - `inventory_quantity = checkStock(COD).available`.
 - ERP: `POST /get-token` `{username,password}` → token; `GET /api/all_parts`;
   `POST /api/checkStock` `[{cod_producto, quantity}]` → `[{available, complete_purchase}]`;
   dropdowns `/api/marcas|categories|modelos|subsistema|anio/dropdown`. El bug
@@ -69,7 +69,7 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 
 - Columnas `abandoned_*` **confirmadas** (`cart.ts`).
 - Motor: `retrieveAbandonedCarts` filtra `email IS NOT NULL`, `email NOT LIKE
-  '%storebotmail%'`, `completed_at IS NULL`, `created_at > now() - N días`
+'%storebotmail%'`, `completed_at IS NULL`, `created_at > now() - N días`
   (`days_to_track`, 30), `abandoned_completed_at IS NULL`, con items.
 - Job `*/5 * * * *`: por carrito calcula el siguiente intervalo a partir de
   `abandoned_last_interval`; base = `created_at`, o `updated_at` si el carrito
@@ -80,7 +80,7 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
   `abandoned_completed_at`.
 - **Hallazgo:** `intervals: []` → el job termina en "No intervals" siempre.
   En producción hoy **no se envían emails automáticos**; solo `POST
-  admin/abandoned-cart {id}` manual. Negocio debe definir los intervalos
+admin/abandoned-cart {id}` manual. Negocio debe definir los intervalos
   antes de activar `SHINERAY_ABANDONED_CART_ENABLED`.
 - Link de recuperación: `${STORE_CORS}/cart` (→ `shineray.storefront_url`).
 
@@ -95,18 +95,18 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 - Datafast: `POST {oppwa}/v1/checkouts` form-urlencoded; éxito `000.200.100`;
   `SHOPPER_VAL_BASEIMP = amount/1.15`, `SHOPPER_VAL_IVA = base*0.15`;
   `merchantTransactionId = {cart_id}_{timestamp}`; `identificationDocId =
-  dni[0:10]`. Authorize: `GET {oppwa}{transactionURL}?entityId=...`, éxito
+dni[0:10]`. Authorize: `GET {oppwa}{transactionURL}?entityId=...`, éxito
   `000.000.000`; `transactionURL` lo pone el frontend vía
   `updatePaymentSession` (`resourcePath`). Credenciales hardcodeadas
   **confirmadas** (entityId, Bearer, MID/TID/ECI/PSERV).
 - DeUna: `POST {URL_DEUNA}/payment/request` con `x-api-key`/`x-api-secret`,
   `pointOfSale`, `qrType: dynamic`, `internalTransactionReference =
-  cart_id[0:20]`; devuelve `transactionId`, `qr`, `deeplink`. **IVA
+cart_id[0:20]`; devuelve `transactionId`, `qr`, `deeplink`. **IVA
   calculado como `amount*0.85` / `amount*0.15`** (distinto a Datafast, que
   divide por 1.15) — unificar en `TaxCalculator`.
 - Webhook DeUna: valida `Authorization`/`x-api-key` contra
   `MEDUSA_ACCESS_API_KEY`; busca el carrito con `LIKE
-  '%internalTransactionReference%'`; con `APPROVED|SUCCESS` completa el
+'%internalTransactionReference%'`; con `APPROVED|SUCCESS` completa el
   carrito y captura la orden logueándose como admin con credenciales
   hardcodeadas (**confirmado**). En Laravel: `payments.gateway_reference` =
   `transactionId` y `metadata.internal_reference` indexado.
@@ -114,11 +114,11 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
   aleatorio de 32 hex, `idAgenciaTransporte`, `nombreAgenciaTransporte`,
   `cuotas`, cliente `{typeId:1, clientId: ruc}`. Guía siempre `"000000"`.
 - **Payload de factura al ERP (todos los gateways):** `id, paymentType,
-  paymentBrand, total, subTotal, discountPercentage, discountAmount,
-  currency, batchNo "01010000", idGuiaServientrega, costShipingCalculate,
-  shipingDiscount, card{cardType,bin,last4Digits,holder,expiryMonth,
-  expiryYear,acquirerCode "DTF"}, client{typeId,name,lastName,clientId,
-  address}, cod_products[{codProducto, price(original_total), quantity}]`.
+paymentBrand, total, subTotal, discountPercentage, discountAmount,
+currency, batchNo "01010000", idGuiaServientrega, costShipingCalculate,
+shipingDiscount, card{cardType,bin,last4Digits,holder,expiryMonth,
+expiryYear,acquirerCode "DTF"}, client{typeId,name,lastName,clientId,
+address}, cod_products[{codProducto, price(original_total), quantity}]`.
   Endpoints: `save_invoice/cf/parts` (Datafast), `cf1/parts` (DeUna),
   `datafast_b2b`, `deuna_b2b`, `cf1/credito_directo`. `InvoicePayload` se
   ampliará en la Fase 4 con `card` y `client.typeId`.
@@ -131,7 +131,7 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 
 - Cotización SOAP `cotizador_ser_recaudo.php`: `producto MERCANCIA PREMIER`,
   `origen GUAYAQUIL`, `destino "{city}-{province}"`, `valor_mercaderia =
-  cart.total/100`, `piezas 1`, `peso = max(2, Σ (weight||1) × qty)`,
+cart.total/100`, `piezas 1`, `peso = max(2, Σ (weight||1) × qty)`,
   dimensiones 1, credenciales `PRUEBA/s12345ABCDe/token` hardcodeadas,
   `rejectUnauthorized: false`, timeout 6 s, respuesta XML doblemente anidada
   (`Result` → `he.decode` → `ConsultarResult.flete`). Fallback 500 centavos.
@@ -141,7 +141,7 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 - Guía real: `POST https://swservicli.servientrega.com.ec:5052/api/guiawebs`
   con `login_creacion MOT.0928430156 / password massline`,
   `id_tipo_logistica 2`, `id_ciudad_origen 1`, `id_ciudad_destino =
-  shipping_address.metadata.city_id`, `id_destinatario_ne_cl = dni`,
+shipping_address.metadata.city_id`, `id_destinatario_ne_cl = dni`,
   `razon_social_desti_ne "Shineray"`, remitente fijo (id `Shineray`,
   `Shineray S.A.`, `Shineray Repuestos`, `Av. 14 S-E - Galo Pl. Lasso 13`,
   `09968767485`), `id_producto 2`, `contenido Repuestos`,
@@ -155,9 +155,9 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 ## Módulo 06 — B2B (corregido)
 
 - Endpoints ERP: `get_all_ruc_b2b_customer` → `{clientes:[{id, tipo_cliente,
-  email, nombres, apellidos, celular, activo, direcciones}]}`;
+email, nombres, apellidos, celular, activo, direcciones}]}`;
   `politicas_b2b_ecommerce` → `[{COD_CLIENTEH, cuotas_info:[{es_activo,
-  factor_credito, num_cuotas}]}]`; `get_info_transportista_ecommerce` →
+factor_credito, num_cuotas}]}]`; `get_info_transportista_ecommerce` →
   `{transportistas:[{RAZON_SOCIAL, RUC}]}`; `get_client_orders_ecommerce/{ruc}`
   (deuda); `parts_ecommerce_recomended_b2b` → `[{COD_PERSONA, COD_PRODUCTO}]`
   (recomendados = filtro simple por RUC, sin lógica adicional).
@@ -166,7 +166,7 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
   (implementado en `B2bClient::normalizePolicyType()`).
 - `client-b2b-verify`: password fijo `shineray2024` (hash scrypt) **y además**
   envía email de reset de contraseña. En Laravel: `Customer.password = null`
-  + invitación con token de reset; no hace falta el hash fijo.
+    - invitación con token de reset; no hace falta el hash fijo.
 - Bugs de atomicidad `.delete()`/`.save()` sin `await` y `clear()` sin
   transacción **confirmados**. `client_b2b.active` es `string` en Node.
 - Rutas store B2B sin auth + CORS `*` **confirmado**; `sync-*-b2b` públicos
@@ -176,7 +176,7 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 
 - `custom-ses.ts` con SES SDK; templates Handlebars `html.hbs` + `subject.hbs`
   en `data/templates/{order_placed, customer_password_reset,
-  user_password_reset, abandoned_cart}`.
+user_password_reset, abandoned_cart}`.
 - BCC de `order.placed` hardcodeado a 4 direcciones `@massline.com.ec`
   (**confirmado**) → `SHINERAY_ORDER_PLACED_BCC`.
 

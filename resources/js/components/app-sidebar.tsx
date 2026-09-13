@@ -1,7 +1,16 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import {
+    BadgePercent,
+    Boxes,
+    Building2,
+    ClipboardList,
+    LayoutGrid,
+    RefreshCw,
+    ShoppingBasket,
+    ShoppingCart,
+    Users,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -14,27 +23,30 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as abandonedCarts } from '@/routes/admin/abandoned-carts';
+import { clients as b2bClients } from '@/routes/admin/b2b';
+import { index as customers } from '@/routes/admin/customers';
+import { index as discounts } from '@/routes/admin/discounts';
+import { index as logs } from '@/routes/admin/logs';
+import { index as orders } from '@/routes/admin/orders';
+import { index as products } from '@/routes/admin/products';
+import { index as sync } from '@/routes/admin/sync';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
+    { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+    { title: 'Órdenes', href: orders(), icon: ShoppingCart },
+    { title: 'Productos', href: products(), icon: Boxes },
+    { title: 'Clientes', href: customers(), icon: Users },
+    { title: 'B2B', href: b2bClients(), icon: Building2 },
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        title: 'Carritos abandonados',
+        href: abandonedCarts(),
+        icon: ShoppingBasket,
     },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+    { title: 'Cupones', href: discounts(), icon: BadgePercent },
+    { title: 'Sincronización ERP', href: sync(), icon: RefreshCw },
+    { title: 'Bitácora integraciones', href: logs(), icon: ClipboardList },
 ];
 
 export function AppSidebar() {
@@ -57,7 +69,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

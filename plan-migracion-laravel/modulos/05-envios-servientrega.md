@@ -7,40 +7,40 @@
   lanzan `Error("not implemented")` (cancelación, devoluciones, documentos/
   etiquetas) — hoy no existen ni en v1 ni en producción, no hay nada que
   "preservar" ahí, es funcionalidad ausente si se quiere paridad real.
-  - `calculatePrice` (líneas ~77-141): cotización SOAP real, con reglas de
-    negocio: peso mínimo forzado a 2kg si el total pesa menos (líneas
-    ~99-101), peso de variante sin dato se asume 1kg (línea ~91), origen
-    hardcodeado a `"GUAYAQUIL"` (línea ~106), dimensiones hardcodeadas a `1`
-    (líneas ~110-112) — **preservar estas reglas**, no son bugs, son
-    aproximaciones de negocio deliberadas (documentar el porqué si se puede
-    confirmar con quien las escribió).
-  - `createFulfillment` (líneas ~15-63): **usa datos de prueba hardcodeados,
-    nunca corre en producción** — la creación de guía real ocurre en un
-    archivo separado, ver abajo. No portar este método como si fuera el
-    flujo real.
-  - **Traga cualquier excepción y devuelve $5.00 fijo** en `calculatePrice`
-    (líneas ~150-152) sin loguear nada — en Laravel, el equivalente debe
-    **loguear el fallo** (a `payment_logs`/un log dedicado) antes de aplicar
-    cualquier fallback, para no repetir el silencio actual.
+    - `calculatePrice` (líneas ~77-141): cotización SOAP real, con reglas de
+      negocio: peso mínimo forzado a 2kg si el total pesa menos (líneas
+      ~99-101), peso de variante sin dato se asume 1kg (línea ~91), origen
+      hardcodeado a `"GUAYAQUIL"` (línea ~106), dimensiones hardcodeadas a `1`
+      (líneas ~110-112) — **preservar estas reglas**, no son bugs, son
+      aproximaciones de negocio deliberadas (documentar el porqué si se puede
+      confirmar con quien las escribió).
+    - `createFulfillment` (líneas ~15-63): **usa datos de prueba hardcodeados,
+      nunca corre en producción** — la creación de guía real ocurre en un
+      archivo separado, ver abajo. No portar este método como si fuera el
+      flujo real.
+    - **Traga cualquier excepción y devuelve $5.00 fijo** en `calculatePrice`
+      (líneas ~150-152) sin loguear nada — en Laravel, el equivalente debe
+      **loguear el fallo** (a `payment_logs`/un log dedicado) antes de aplicar
+      cualquier fallback, para no repetir el silencio actual.
 - `src/utils/servientrega-guide.ts` (93 líneas) — **el código que sí corre en
   producción** para crear la guía real, invocado directo desde los payment
   processors de Datafast/DeUna (no desde el fulfillment service). Duplica
   casi literal la plantilla SOAP de cotización del archivo anterior, con
   **endpoint y credenciales distintas**:
-  - Cotización: mismo WSDL SOAP `cotizador_ser_recaudo.php`.
-  - Creación de guía real: `POST https://swservicli.servientrega.com.ec:5052/api/guiawebs`
-    con `login_creacion: "MOT.0928430156"` / `password: "massline"`.
-  - El `servientrega-fulfillment.ts` en cambio postea a
-    `https://181.39.87.158:8021/api/guiawebs` (IP directa, puerto distinto,
-    credenciales de prueba `motorcycle.assembly`/`123456`) — **este segundo
-    endpoint parece no ser el real**; confirmar con Servientrega/negocio cuál
-    de los dos es el vigente antes de implementar el cliente nuevo. No
-    implementar ambos "por si acaso".
-  - `peso_fisico: Number((totalWeight / 10).toFixed(2))` en la creación de
-    guía real — **nota de inconsistencia**: esto divide el peso entre 10,
-    mientras que `calculatePrice` no lo hace. Confirmar con negocio si es
-    intencional (unidades distintas entre cotización y guía) antes de portar
-    — no asumir que es un bug ni asumir que es correcto.
+    - Cotización: mismo WSDL SOAP `cotizador_ser_recaudo.php`.
+    - Creación de guía real: `POST https://swservicli.servientrega.com.ec:5052/api/guiawebs`
+      con `login_creacion: "MOT.0928430156"` / `password: "massline"`.
+    - El `servientrega-fulfillment.ts` en cambio postea a
+      `https://181.39.87.158:8021/api/guiawebs` (IP directa, puerto distinto,
+      credenciales de prueba `motorcycle.assembly`/`123456`) — **este segundo
+      endpoint parece no ser el real**; confirmar con Servientrega/negocio cuál
+      de los dos es el vigente antes de implementar el cliente nuevo. No
+      implementar ambos "por si acaso".
+    - `peso_fisico: Number((totalWeight / 10).toFixed(2))` en la creación de
+      guía real — **nota de inconsistencia**: esto divide el peso entre 10,
+      mientras que `calculatePrice` no lo hace. Confirmar con negocio si es
+      intencional (unidades distintas entre cotización y guía) antes de portar
+      — no asumir que es un bug ni asumir que es correcto.
 - Credenciales SOAP de cotización hardcodeadas en ambos archivos: usuario
   `PRUEBA`, password `s12345ABCDe`, token
   `1593aaeeb60a560c156387989856db6be7edc8dc220f9feae3aea237da6a951d` — mover

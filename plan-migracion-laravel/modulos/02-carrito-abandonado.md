@@ -34,14 +34,14 @@ No hace falta tabla aparte: es un carrito con estado.
   inventarse un valor nuevo.
 - Un **Job programado** (`app/Domain/Cart/Jobs/DetectAbandonedCartsJob.php`),
   agendado cada 5 minutos igual que hoy, que:
-  1. Encuentra carritos activos sin actividad reciente y sin
-     `abandoned_lastdate`, los marca y dispara el primer email.
-  2. Para carritos ya marcados, aplica la lógica de reintento
-     (`abandoned_count`, `abandoned_last_interval`) para decidir si toca
-     reenviar o ya se debe marcar `abandoned_completed_at`.
-  3. Envía el email vía el sistema de notificaciones de Laravel (ver
-     `modulos/08-notificaciones.md`), no acoplado a un servicio de mail
-     propio.
+    1. Encuentra carritos activos sin actividad reciente y sin
+       `abandoned_lastdate`, los marca y dispara el primer email.
+    2. Para carritos ya marcados, aplica la lógica de reintento
+       (`abandoned_count`, `abandoned_last_interval`) para decidir si toca
+       reenviar o ya se debe marcar `abandoned_completed_at`.
+    3. Envía el email vía el sistema de notificaciones de Laravel (ver
+       `modulos/08-notificaciones.md`), no acoplado a un servicio de mail
+       propio.
 - Un carrito que se completa (pasa a `orders`) debe limpiar/journal-ear su
   estado de abandono — replicar `setCartsAsCompleted` como parte del flujo
   de checkout (`modulos/03-ordenes-checkout.md`), no como un paso aparte.

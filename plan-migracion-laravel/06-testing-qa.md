@@ -3,7 +3,7 @@
 ## Punto de partida: cero red de seguridad
 
 El código Node actual tiene prácticamente cero tests de comportamiento real
-(un solo test de servicio placeholder, y un test que verifica *texto fuente*
+(un solo test de servicio placeholder, y un test que verifica _texto fuente_
 del sync de productos, no ejecuta lógica). Esto significa que **no hay
 especificación ejecutable** de qué es "correcto" — solo el código en sí y
 esta auditoría. La migración a Laravel es la oportunidad de construir esa
@@ -13,6 +13,7 @@ módulo, no como una fase aparte al final.
 ## Regla no negociable
 
 **Ningún módulo se da por terminado sin tests que cubran, como mínimo:**
+
 - El "camino feliz" de cada método público del contrato correspondiente
   (`03-contratos.md`).
 - Los casos de fallo del proveedor externo (timeout, respuesta con error,
@@ -62,6 +63,7 @@ módulo, no como una fase aparte al final.
 Además de los tests automatizados, antes de la Fase 10
 (`05-migracion-datos-corte.md`) se necesita una pasada manual de QA sobre
 staging con datos migrados, cubriendo al menos:
+
 - Checkout completo B2C con Datafast y con DeUna (tarjeta real de prueba en
   sandbox).
 - Checkout completo B2B con crédito.
