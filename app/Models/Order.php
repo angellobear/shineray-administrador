@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentGateway;
 use Carbon\CarbonInterface;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -72,6 +73,12 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    /** @return MorphMany<Address, $this> */
+    public function addresses(): MorphMany
+    {
+        return $this->morphMany(Address::class, 'addressable');
+    }
+
     /** @return BelongsTo<Address, $this> */
     public function shippingAddress(): BelongsTo
     {
@@ -135,6 +142,18 @@ class Order extends Model
         };
 
         return $this;
+    }
+
+    public function latestPayment(): ?Payment
+    {
+        return $this->payments()->latest('id')->first();
+    }
+
+    public function gateway(): ?PaymentGateway
+    {
+        $value = $this->metadata['gateway'] ?? null;
+
+        return is_string($value) ? PaymentGateway::tryFrom($value) : null;
     }
 
     public function isB2b(): bool

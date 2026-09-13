@@ -77,6 +77,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Checkout
+    |--------------------------------------------------------------------------
+    */
+
+    'checkout' => [
+        // Gateways que el storefront puede elegir. `manual` queda fuera a propósito.
+        'storefront_gateways' => ['datafast', 'deuna', 'datafast_b2b', 'deuna_b2b', 'credito_b2b'],
+        'order_number_prefix' => env('SHINERAY_ORDER_NUMBER_PREFIX', 'SH'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Sincronización con el ERP
     |--------------------------------------------------------------------------
     |

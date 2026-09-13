@@ -10,11 +10,14 @@ enum PaymentGateway: string
     case DeunaB2b = 'deuna_b2b';
     case CreditoB2b = 'credito_b2b';
 
+    /** Orden creada/aprobada a mano desde el admin o en pruebas; nunca desde el storefront. */
+    case Manual = 'manual';
+
     public function isB2b(): bool
     {
         return match ($this) {
             self::DatafastB2b, self::DeunaB2b, self::CreditoB2b => true,
-            self::Datafast, self::Deuna => false,
+            self::Datafast, self::Deuna, self::Manual => false,
         };
     }
 
@@ -24,6 +27,6 @@ enum PaymentGateway: string
      */
     public function usesExternalProcessor(): bool
     {
-        return $this !== self::CreditoB2b;
+        return $this !== self::CreditoB2b && $this !== self::Manual;
     }
 }

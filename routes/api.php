@@ -3,6 +3,8 @@
 use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\CartDiscountController;
 use App\Http\Controllers\Store\CartItemController;
+use App\Http\Controllers\Store\CheckoutController;
+use App\Http\Controllers\Store\OrderController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\SearchController;
 use App\Http\Controllers\Store\StockController;
@@ -33,5 +35,11 @@ Route::prefix('store')->name('store.')->group(function (): void {
         Route::delete('{cart}/items/{item}', [CartItemController::class, 'destroy'])->scopeBindings()->name('items.destroy');
         Route::post('{cart}/discounts', [CartDiscountController::class, 'store'])->name('discounts.store');
         Route::delete('{cart}/discounts/{discount:code}', [CartDiscountController::class, 'destroy'])->name('discounts.destroy');
+        Route::post('{cart}/checkout', [CheckoutController::class, 'start'])->middleware('throttle:20,1')->name('checkout.start');
+    });
+
+    Route::prefix('orders')->name('orders.')->group(function (): void {
+        Route::get('{order}', [OrderController::class, 'show'])->name('show');
+        Route::post('{order}/complete', [CheckoutController::class, 'complete'])->middleware('throttle:20,1')->name('complete');
     });
 });

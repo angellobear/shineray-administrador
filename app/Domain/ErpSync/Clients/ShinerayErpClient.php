@@ -266,6 +266,7 @@ final class ShinerayErpClient implements ErpClientContract
             PaymentGateway::DatafastB2b => '/api/save_invoice/datafast_b2b',
             PaymentGateway::DeunaB2b => '/api/save_invoice/deuna_b2b',
             PaymentGateway::CreditoB2b => '/api/save_invoice/cf1/credito_directo',
+            PaymentGateway::Manual => throw new ErpRequestException('Las órdenes manuales no se facturan automáticamente en el ERP.'),
         };
     }
 

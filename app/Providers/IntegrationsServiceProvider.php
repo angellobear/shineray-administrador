@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Domain\ErpSync\Clients\ShinerayErpClient;
 use App\Domain\ErpSync\Contracts\ErpClientContract;
 use App\Domain\Payments\Contracts\PaymentGatewayContract;
+use App\Domain\Payments\Gateways\ManualPaymentGateway;
 use App\Domain\Payments\Gateways\UnconfiguredPaymentGateway;
 use App\Domain\Payments\Services\PaymentGatewayResolver;
 use App\Domain\Search\Contracts\SearchIndexerContract;
@@ -38,6 +39,7 @@ class IntegrationsServiceProvider extends ServiceProvider
                 PaymentGateway::Deuna->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::Deuna),
                 PaymentGateway::DeunaB2b->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::DeunaB2b),
                 PaymentGateway::CreditoB2b->value => fn () => new UnconfiguredPaymentGateway(PaymentGateway::CreditoB2b),
+                PaymentGateway::Manual->value => ManualPaymentGateway::class,
             ]);
         });
 
