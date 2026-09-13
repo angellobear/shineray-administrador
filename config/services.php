@@ -50,17 +50,19 @@ return [
     'deuna' => [
         'base_url' => env('DEUNA_BASE_URL'),
         'api_key' => env('DEUNA_API_KEY'),
+        'api_secret' => env('DEUNA_API_SECRET'),
         'point_of_sale' => env('DEUNA_POINT_OF_SALE'),
+        // Clave que DeUna manda en `Authorization`/`x-api-key` al webhook (hoy MEDUSA_ACCESS_API_KEY).
         'webhook_secret' => env('DEUNA_WEBHOOK_SECRET'),
         'timeout' => (int) env('DEUNA_TIMEOUT', 30),
     ],
 
     'servientrega' => [
-        'quote_url' => env('SERVIENTREGA_QUOTE_URL'),
+        'quote_url' => env('SERVIENTREGA_QUOTE_URL', 'https://servientrega-ecuador.appsiscore.com:443/app/ws/cotizador_ser_recaudo.php'),
         'quote_user' => env('SERVIENTREGA_QUOTE_USER'),
         'quote_password' => env('SERVIENTREGA_QUOTE_PASSWORD'),
         'quote_token' => env('SERVIENTREGA_QUOTE_TOKEN'),
-        'guide_url' => env('SERVIENTREGA_GUIDE_URL'),
+        'guide_url' => env('SERVIENTREGA_GUIDE_URL', 'https://swservicli.servientrega.com.ec:5052/api/guiawebs'),
         'guide_login' => env('SERVIENTREGA_GUIDE_LOGIN'),
         'guide_password' => env('SERVIENTREGA_GUIDE_PASSWORD'),
         'timeout' => (int) env('SERVIENTREGA_TIMEOUT', 30),

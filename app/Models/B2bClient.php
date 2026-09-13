@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Database\Factories\B2bClientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -25,7 +26,7 @@ use Illuminate\Support\Carbon;
  * @property bool $active
  * @property Carbon|null $erp_synced_at
  * @property-read Customer|null $customer
- * @property-read B2bPolicy|null $policy
+ * @property-read Collection<int, B2bPolicy> $policies
  */
 #[Fillable(['customer_id', 'id_client', 'type_client', 'first_name', 'last_name', 'email', 'phone_number', 'address', 'active', 'erp_synced_at'])]
 class B2bClient extends Model
@@ -39,10 +40,20 @@ class B2bClient extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return HasOne<B2bPolicy, $this> */
-    public function policy(): HasOne
+    /**
+     * Políticas de crédito: una por número de cuotas (`cuotas_info` del ERP).
+     *
+     * @return HasMany<B2bPolicy, $this>
+     */
+    public function policies(): HasMany
     {
-        return $this->hasOne(B2bPolicy::class);
+        return $this->hasMany(B2bPolicy::class);
+    }
+
+    /** @return HasMany<B2bPolicy, $this> */
+    public function activePolicies(): HasMany
+    {
+        return $this->policies()->where('is_active', true);
     }
 
     /**

@@ -51,10 +51,14 @@ final readonly class TaxCalculator
 
     /**
      * Convierte un precio del ERP (dólares con IVA incluido, ej. "12.50") a
-     * centavos sin IVA. Equivale al `Math.round((PRECIO / 1.15) * 100)` actual.
+     * centavos sin IVA. Replica la cadena de redondeos de `shineray-api.js`:
+     * `Math.round(Number((Number(PRECIO.toFixed(2)) / 1.15).toFixed(2)) * 100)`.
      */
     public function erpGrossPriceToNetCents(float|string $grossPrice): int
     {
-        return (int) round(((float) $grossPrice / $this->grossFactor()) * 100);
+        $gross = round((float) $grossPrice, 2);
+        $net = round($gross / $this->grossFactor(), 2);
+
+        return (int) round($net * 100);
     }
 }

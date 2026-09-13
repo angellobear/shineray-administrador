@@ -143,10 +143,25 @@ return [
             // Replica la configuración de medusa-plugin-meilisearch (medusa-config.js 61-221).
             // `hasStock:desc` va ANTES de las reglas por defecto: productos con stock primero.
             'products' => [
-                'searchableAttributes' => ['title', 'description', 'sku', 'handle', 'nombreCategoria', 'nombreSubsistema', 'motoModelo', 'codigoMarca'],
-                'filterableAttributes' => ['status', 'hasStock', 'isB2b', 'isLandingPromo', 'codigoMarca', 'motoModelo', 'codigoCategoria', 'nombreCategoria', 'nombreSubsistema', 'nivel1', 'nivel2', 'nivel3', 'nivel4', 'anioDesde', 'anioHasta', 'price'],
-                'sortableAttributes' => ['price', 'title', 'hasStock'],
+                'searchableAttributes' => [
+                    'title', 'description', 'codigoMarca', 'codigoCategoria', 'motoModelo', 'codigoSubsistema',
+                    'anioDesde', 'anioHasta', 'codigoProducto', 'nombreMarca', 'nombreCategoria', 'codigoModeloMoto',
+                    'nombreSubsistema', 'nivel1', 'nivel2', 'nivel3', 'nivel4', 'isB2b', 'isLandingPromo',
+                ],
                 'rankingRules' => ['hasStock:desc', 'words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
+                'displayedAttributes' => [
+                    'id', 'title', 'description', 'thumbnail', 'handle', 'price', 'codigoMarca', 'codigoCategoria',
+                    'motoModelo', 'codigoSubsistema', 'anioDesde', 'anioHasta', 'codigoProducto', 'nombreMarca',
+                    'nombreCategoria', 'codigoModeloMoto', 'nombreSubsistema', 'nivel1', 'codNivel1', 'nivel2',
+                    'codNivel2', 'nivel3', 'codNivel3', 'nivel4', 'codNivel4', 'isB2b', 'isLandingPromo', 'OldPrice',
+                    'hasStock', 'status',
+                ],
+                // `codigoCategoria` se mantiene por retrocompatibilidad hasta que el front migre a nivel2.
+                'filterableAttributes' => [
+                    'price', 'nombreMarca', 'nombreSubsistema', 'codigoCategoria', 'nivel1', 'nivel2', 'isB2b',
+                    'codigoProducto', 'isLandingPromo', 'status',
+                ],
+                'sortableAttributes' => ['hasStock', 'price'],
             ],
         ],
         'model-settings' => [

@@ -48,7 +48,9 @@ No hace falta tabla aparte: es un carrito con estado.
 
 ## Decisiones pendientes
 
-- Confirmar los intervalos exactos y número máximo de reintentos leyendo la
-  configuración real de `medusa-plugin-abandoned-cart` en `medusa-config.js`
-  y cualquier variable de entorno asociada — no están completamente
-  documentados en el propio `abandoned-cart.ts`.
+- **Verificado (2026-09-13):** no hay intervalos configurados en ningún
+  lado (`options_.intervals = []` en `abandoned-cart.ts` y el plugin no está
+  en `medusa-config.js`). El cron termina sin hacer nada; hoy solo existe el
+  envío manual desde el admin. Negocio debe definir los intervalos (ej. 1 h,
+  24 h, 72 h) antes de activar el job en Laravel. La lógica de reintento sí
+  está implementada y se documenta en `07-verificacion-codigo.md`.

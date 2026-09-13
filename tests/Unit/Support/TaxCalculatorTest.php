@@ -31,3 +31,12 @@ test('exposes the gross factor derived from the rate', function () {
     expect((new TaxCalculator(0.15))->grossFactor())->toBe(1.15);
     expect((new TaxCalculator(0.12))->grossFactor())->toBe(1.12);
 });
+
+test('replicates the double rounding of the legacy ERP price conversion', function () {
+    $calculator = new TaxCalculator(0.15);
+
+    // 1.149 → 1.15 → 1.00 → 100 (the legacy chain rounds the ERP price to 2 decimals first)
+    expect($calculator->erpGrossPriceToNetCents(1.149))->toBe(100);
+    // 2.30 → 2.00 → 200
+    expect($calculator->erpGrossPriceToNetCents('2.30'))->toBe(200);
+});

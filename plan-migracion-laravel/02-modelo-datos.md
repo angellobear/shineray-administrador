@@ -106,10 +106,13 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
   externo Shineray/RUC, único), `type_client`, `first_name`, `last_name`,
   `phone_number`, `email`, `address` (jsonb), `active` (boolean)
 
-**`policies_b2b`**
+**`policies_b2b`** (implementada como `b2b_policies`)
 - `id`, `client_b2b_id` FK (**corrige** el `cod_cliente varchar` suelto de
   hoy, que no es una FK real), `es_activo` (boolean), `factor_credito`
   (decimal), `num_cuotas` (integer)
+- **Varias por cliente**: el ERP manda `cuotas_info[]` con una política por
+  número de cuotas. Único `(client_b2b_id, num_cuotas)`. Ver
+  `07-verificacion-codigo.md`.
 
 **`transportistas_b2b`**
 - `id`, `razon_social`, `ruc`

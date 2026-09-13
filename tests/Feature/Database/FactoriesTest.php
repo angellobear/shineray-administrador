@@ -41,14 +41,24 @@ test('every model can be persisted through its factory against the schema', func
     ErpSyncRun::class,
 ]);
 
-test('a B2B client links to its customer and credit policy through real foreign keys', function () {
+test('a B2B client links to its customer and credit policies through real foreign keys', function () {
     $client = B2bClient::factory()->forCustomer()->create();
-    $policy = B2bPolicy::factory()->for($client, 'client')->create();
+    B2bPolicy::factory()->for($client, 'client')->create(['installments' => 3]);
+    B2bPolicy::factory()->for($client, 'client')->create(['installments' => 6, 'is_active' => false]);
 
     expect($client->fresh())
         ->customer->toBeInstanceOf(Customer::class)
-        ->policy->is($policy)->toBeTrue();
+        ->policies->toHaveCount(2)
+        ->activePolicies->toHaveCount(1);
     expect($client->customer->b2bClient->is($client))->toBeTrue();
+});
+
+test('rejects two policies with the same installments for one client', function () {
+    $client = B2bClient::factory()->create();
+    B2bPolicy::factory()->for($client, 'client')->create(['installments' => 3]);
+
+    expect(fn () => B2bPolicy::factory()->for($client, 'client')->create(['installments' => 3]))
+        ->toThrow(QueryException::class);
 });
 
 test('rejects two payments with the same gateway reference', function () {

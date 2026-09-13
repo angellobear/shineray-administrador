@@ -107,6 +107,7 @@ módulo las señala en su sección "Decisiones pendientes":
 - `04-fases-y-cronograma.md` — orden de construcción, dependencias, estimado.
 - `05-migracion-datos-corte.md` — ETL de datos existentes y estrategia de corte.
 - `06-testing-qa.md` — estrategia de pruebas.
+- `07-verificacion-codigo.md` — hallazgos verificados contra el código Node real.
 - `modulos/01-productos-catalogo.md`
 - `modulos/02-carrito-abandonado.md`
 - `modulos/03-ordenes-checkout.md`
