@@ -34,6 +34,8 @@ return [
         'min_weight_kg' => (float) env('SHINERAY_SHIPPING_MIN_WEIGHT_KG', 2),
         'default_variant_weight_kg' => (float) env('SHINERAY_SHIPPING_DEFAULT_VARIANT_WEIGHT_KG', 1),
         'free_shipping_cost_cents' => (int) env('SHINERAY_FREE_SHIPPING_COST_CENTS', 430),
+        // Hoy los pedidos B2B no generan guía (proceso manual). Pendiente de negocio.
+        'create_guides_for_b2b' => (bool) env('SHINERAY_SHIPPING_GUIDES_FOR_B2B', false),
         'quote' => [
             'product' => 'MERCANCIA PREMIER',
             'timeout_seconds' => (int) env('SHINERAY_SHIPPING_QUOTE_TIMEOUT', 6),

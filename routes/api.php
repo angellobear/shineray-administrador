@@ -7,6 +7,7 @@ use App\Http\Controllers\Store\CheckoutController;
 use App\Http\Controllers\Store\OrderController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\SearchController;
+use App\Http\Controllers\Store\ShippingQuoteController;
 use App\Http\Controllers\Store\StockController;
 use App\Http\Controllers\Webhooks\DeunaWebhookController;
 use App\Http\Middleware\VerifyDeunaWebhook;
@@ -37,6 +38,7 @@ Route::prefix('store')->name('store.')->group(function (): void {
         Route::delete('{cart}/items/{item}', [CartItemController::class, 'destroy'])->scopeBindings()->name('items.destroy');
         Route::post('{cart}/discounts', [CartDiscountController::class, 'store'])->name('discounts.store');
         Route::delete('{cart}/discounts/{discount:code}', [CartDiscountController::class, 'destroy'])->name('discounts.destroy');
+        Route::post('{cart}/shipping-quote', ShippingQuoteController::class)->middleware('throttle:30,1')->name('shipping-quote');
         Route::post('{cart}/checkout', [CheckoutController::class, 'start'])->middleware('throttle:20,1')->name('checkout.start');
     });
 

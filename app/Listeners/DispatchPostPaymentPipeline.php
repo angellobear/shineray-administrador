@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Domain\Payments\Jobs\SaveInvoiceToErpJob;
+use App\Domain\Shipping\Jobs\CreateShipmentGuideJob;
 use App\Events\PaymentAuthorized;
 use Illuminate\Support\Facades\Bus;
 
@@ -25,6 +26,7 @@ class DispatchPostPaymentPipeline
     public static function jobsFor(PaymentAuthorized $event): array
     {
         return [
+            new CreateShipmentGuideJob($event->order),
             new SaveInvoiceToErpJob($event->order, $event->payment),
         ];
     }

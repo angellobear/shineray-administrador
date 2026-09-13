@@ -13,7 +13,7 @@ use App\Domain\Payments\Services\PaymentGatewayResolver;
 use App\Domain\Search\Contracts\SearchIndexerContract;
 use App\Domain\Search\Indexers\ScoutSearchIndexer;
 use App\Domain\Shipping\Contracts\ShippingProviderContract;
-use App\Domain\Shipping\Providers\UnconfiguredShippingProvider;
+use App\Domain\Shipping\Providers\ServientregaProvider;
 use App\Enums\PaymentGateway;
 use App\Support\TaxCalculator;
 use Illuminate\Contracts\Container\Container;
@@ -22,7 +22,7 @@ use Illuminate\Support\ServiceProvider;
 /**
  * Único lugar donde se decide qué implementación concreta responde a cada
  * contrato de integración externa. Los módulos reemplazan aquí el stub
- * `Unconfigured*` por la implementación real cuando la construyen.
+ * la implementación concreta de cada contrato.
  */
 class IntegrationsServiceProvider extends ServiceProvider
 {
@@ -30,7 +30,7 @@ class IntegrationsServiceProvider extends ServiceProvider
     {
         $this->app->singleton(TaxCalculator::class, fn (): TaxCalculator => TaxCalculator::fromConfig());
 
-        $this->app->bind(ShippingProviderContract::class, UnconfiguredShippingProvider::class);
+        $this->app->bind(ShippingProviderContract::class, ServientregaProvider::class);
         $this->app->bind(ErpClientContract::class, ShinerayErpClient::class);
         $this->app->bind(SearchIndexerContract::class, ScoutSearchIndexer::class);
 

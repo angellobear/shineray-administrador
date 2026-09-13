@@ -14,6 +14,7 @@ final readonly class ShippingGuideRequest
     public function __construct(
         public string $orderNumber,
         public string $recipientName,
+        public string $recipientLastName,
         public string $recipientDni,
         public string $recipientPhone,
         public string $recipientAddress,

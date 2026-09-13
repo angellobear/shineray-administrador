@@ -2,6 +2,7 @@
 
 use App\Domain\Cart\Services\CartService;
 use App\Domain\Payments\Jobs\SaveInvoiceToErpJob;
+use App\Domain\Shipping\Jobs\CreateShipmentGuideJob;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\ProductVariant;
@@ -32,5 +33,5 @@ test('a storefront checkout with Datafast runs end to end and queues the ERP inv
     $order = Order::query()->where('order_number', $start->json('order.order_number'))->firstOrFail();
     expect($order->status)->toBe(OrderStatus::Paid);
     expect($order->latestPayment()->raw_response['card']['last4Digits'])->toBe('1111');
-    Bus::assertChained([SaveInvoiceToErpJob::class]);
+    Bus::assertChained([CreateShipmentGuideJob::class, SaveInvoiceToErpJob::class]);
 });

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://servientrega-ecuador.appsiscore.com/app/ws/cotizador_ser_recaudo.php">
+  <SOAP-ENV:Body>
+    <ns1:ConsultarResponse>
+      <Result xsi:type="xsd:string" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">&lt;ConsultarResult&gt;&lt;flete&gt;4.30&lt;/flete&gt;&lt;valor_seguro&gt;0.00&lt;/valor_seguro&gt;&lt;valor_total&gt;4.30&lt;/valor_total&gt;&lt;/ConsultarResult&gt;</Result>
+    </ns1:ConsultarResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
