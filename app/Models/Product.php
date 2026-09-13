@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Catalog\CatalogTaxonomy;
 use App\Enums\ProductStatus;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -76,21 +77,67 @@ class Product extends Model
         return $this->isPublished() && $this->deleted_at === null;
     }
 
+    public function searchableAs(): string
+    {
+        return 'products';
+    }
+
     /**
-     * Forma del documento en Meilisearch. La Fase 1 completa esto con la
-     * taxonomía (nivel 1-4, deriveSubsistema), hasStock, isB2b, etc.
+     * Forma del documento en Meilisearch: réplica del `transformer` de
+     * medusa-plugin-meilisearch para no romper el storefront. Las claves de
+     * `metadata` son las del ERP (mayúsculas).
      *
      * @return array<string, mixed>
      */
     public function toSearchableArray(): array
     {
+        $metadata = $this->metadata ?? [];
+        $variant = $this->relationLoaded('variant') ? $this->variant : $this->variant()->first();
+
         return [
             'id' => $this->id,
+            'status' => $this->status->value,
             'title' => $this->title,
             'description' => $this->description,
-            'handle' => $this->handle,
             'thumbnail' => $this->thumbnail,
+            'handle' => $this->handle,
+            'price' => $variant?->price,
+            'codigoMarca' => $metadata['CODIGO_MARCA'] ?? null,
+            'codigoCategoria' => $metadata['CODIGO_CATEGORIA'] ?? null,
+            'motoModelo' => $metadata['MOTO_MODELO'] ?? null,
+            'codigoSubsistema' => $metadata['CODIGO_SUBSISTEMA'] ?? null,
+            'anioDesde' => $metadata['ANIO_DESDE'] ?? null,
+            'anioHasta' => $metadata['ANIO_HASTA'] ?? null,
+            'codigoProducto' => $metadata['COD_PRODUCTO'] ?? $variant?->sku,
+            'nombreMarca' => $metadata['NOMBRE_MARCA'] ?? null,
+            'nombreCategoria' => $metadata['NOMBRE_CATEGORIA'] ?? null,
+            'codigoModeloMoto' => $metadata['CODIGO_MODELO_MOTO'] ?? null,
+            'nombreSubsistema' => CatalogTaxonomy::subsistemaFor($metadata),
+            'nivel1' => $metadata['NIVEL_1'] ?? null,
+            'codNivel1' => $metadata['COD_NIVEL_1'] ?? null,
+            'nivel2' => $metadata['NIVEL_2'] ?? null,
+            'codNivel2' => $metadata['COD_NIVEL_2'] ?? null,
+            'nivel3' => $metadata['NIVEL_3'] ?? null,
+            'codNivel3' => $metadata['COD_NIVEL_3'] ?? null,
+            'nivel4' => $metadata['NIVEL_4'] ?? null,
+            'codNivel4' => $metadata['COD_NIVEL_4'] ?? null,
+            'idItemNS' => $metadata['ID_ITEM_NS'] ?? null,
+            'isB2b' => (bool) ($metadata['is_b2b'] ?? false),
+            'isLandingPromo' => (bool) ($metadata['IS_PROMO'] ?? false),
+            'OldPrice' => $metadata['OLD_PRICE'] ?? null,
+            'hasStock' => ($variant->inventory_quantity ?? 0) > 0,
         ];
+    }
+
+    /**
+     * Scout carga la variante al indexar en lote (`scout:import`, sync).
+     *
+     * @param  Builder<Product>  $query
+     * @return Builder<Product>
+     */
+    protected function makeAllSearchableUsing(Builder $query): Builder
+    {
+        return $query->with('variant');
     }
 
     /**

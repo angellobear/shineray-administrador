@@ -31,3 +31,6 @@ yarn-error.log
 
 # Claude Code (personal)
 /.claude/settings.local.json
+
+# Resúmenes de fase (no se trackean)
+/docs

@@ -1,0 +1,67 @@
+[
+  {
+    "COD_PRODUCTO": "MOT-0001",
+    "NOMBRE_PRODUCTO": "Pistón 150cc",
+    "PRECIO": 12.99,
+    "PESO": 1.4,
+    "ICE": 0,
+    "IVA": 15,
+    "ANIO_DESDE": 2018,
+    "ANIO_HASTA": 2024,
+    "COD_AGENCIA": "01",
+    "MOTO_MODELO": "XY150",
+    "CODIGO_MARCA": "SHINERAY",
+    "NOMBRE_MARCA": "Shineray",
+    "NOMBRE_BODEGA": "GUAYAQUIL",
+    "CONTROL_BUFFER": "N",
+    "CODIGO_CATEGORIA": "C01",
+    "NOMBRE_CATEGORIA": "CONJUNTO DE MOTOR",
+    "CODIGO_SUBSISTEMA": null,
+    "CODIGO_MODELO_MOTO": "M150",
+    "NOMBRE_SUBSISTEMA": null,
+    "NIVEL_1": "REPUESTOS",
+    "COD_NIVEL_1": "N1",
+    "NIVEL_2": "MOTOR",
+    "COD_NIVEL_2": "N2",
+    "NIVEL_3": null,
+    "COD_NIVEL_3": null,
+    "NIVEL_4": null,
+    "COD_NIVEL_4": null,
+    "COD_UNIDAD": "UND"
+  },
+  {
+    "COD_PRODUCTO": "MOT-0001",
+    "NOMBRE_PRODUCTO": "Pistón 150cc (bodega Quito)",
+    "PRECIO": 99.99,
+    "PESO": 9,
+    "NOMBRE_BODEGA": "QUITO",
+    "CODIGO_MARCA": "SHINERAY",
+    "NOMBRE_CATEGORIA": "CONJUNTO DE MOTOR"
+  },
+  {
+    "COD_PRODUCTO": "ELE-0002",
+    "NOMBRE_PRODUCTO": "Faro delantero LED",
+    "PRECIO": 46.00,
+    "PESO": null,
+    "CODIGO_MARCA": "SHINERAY",
+    "NOMBRE_MARCA": "Shineray",
+    "NOMBRE_CATEGORIA": "SISTEMA DE LUCES",
+    "NIVEL_1": "REPUESTOS",
+    "NIVEL_2": "ELECTRICO",
+    "NIVEL_3": "ILUMINACION",
+    "COD_UNIDAD": "UND"
+  },
+  {
+    "COD_PRODUCTO": "TAN-0003",
+    "NOMBRE_PRODUCTO": "Tanque de combustible",
+    "PRECIO": null,
+    "PESO": 3,
+    "CODIGO_MARCA": "SHINERAY",
+    "NOMBRE_CATEGORIA": "TANQUE Y ACCESORIOS"
+  },
+  {
+    "COD_PRODUCTO": "",
+    "NOMBRE_PRODUCTO": "Fila corrupta sin código",
+    "PRECIO": 1
+  }
+]

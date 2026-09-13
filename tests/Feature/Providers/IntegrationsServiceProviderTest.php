@@ -35,8 +35,6 @@ test('unimplemented integrations fail loudly instead of returning silently', fun
 
     expect(fn () => $provider->quote($request))
         ->toThrow(IntegrationNotImplementedException::class);
-    expect(fn () => app(ErpClientContract::class)->fetchProducts())
-        ->toThrow(IntegrationNotImplementedException::class);
 });
 
 test('the tax calculator reads the IVA rate from configuration', function () {

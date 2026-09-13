@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Domain\ErpSync\Clients\UnconfiguredErpClient;
+use App\Domain\ErpSync\Clients\ShinerayErpClient;
 use App\Domain\ErpSync\Contracts\ErpClientContract;
 use App\Domain\Payments\Contracts\PaymentGatewayContract;
 use App\Domain\Payments\Gateways\UnconfiguredPaymentGateway;
@@ -28,7 +28,7 @@ class IntegrationsServiceProvider extends ServiceProvider
         $this->app->singleton(TaxCalculator::class, fn (): TaxCalculator => TaxCalculator::fromConfig());
 
         $this->app->bind(ShippingProviderContract::class, UnconfiguredShippingProvider::class);
-        $this->app->bind(ErpClientContract::class, UnconfiguredErpClient::class);
+        $this->app->bind(ErpClientContract::class, ShinerayErpClient::class);
         $this->app->bind(SearchIndexerContract::class, ScoutSearchIndexer::class);
 
         $this->app->singleton(PaymentGatewayResolver::class, function (Container $app): PaymentGatewayResolver {

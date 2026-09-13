@@ -1,0 +1,5 @@
+[
+  {"cod_producto": "MOT-0001", "available": 12, "complete_purchase": true},
+  {"cod_producto": "ELE-0002", "available": 0, "complete_purchase": false},
+  {"cod_producto": "TAN-0003", "available": 3, "complete_purchase": true}
+]

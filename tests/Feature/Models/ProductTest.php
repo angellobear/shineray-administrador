@@ -42,3 +42,32 @@ test('exposes the single variant of a product', function () {
     expect($product->variant)->toBeInstanceOf(ProductVariant::class);
     expect($product->variants)->toHaveCount(1);
 });
+
+test('builds the search document with the same shape the storefront reads today', function () {
+    $product = Product::factory()->create([
+        'metadata' => [
+            'CODIGO_MARCA' => 'SHINERAY', 'NOMBRE_MARCA' => 'Shineray', 'NOMBRE_CATEGORIA' => 'SISTEMA DE LUCES',
+            'NIVEL_1' => 'REPUESTOS', 'COD_NIVEL_1' => 'N1', 'NIVEL_2' => 'ELECTRICO', 'NIVEL_3' => null,
+            'ANIO_DESDE' => 2018, 'is_b2b' => true, 'IS_PROMO' => false, 'OLD_PRICE' => 2000, 'COD_PRODUCTO' => 'ELE-1',
+        ],
+    ]);
+    ProductVariant::factory()->for($product)->create(['sku' => 'ELE-1', 'price' => 1500, 'inventory_quantity' => 3]);
+
+    $document = $product->fresh()->toSearchableArray();
+
+    expect($document)
+        ->toHaveKey('id', $product->id)
+        ->toHaveKey('status', 'published')
+        ->toHaveKey('price', 1500)
+        ->toHaveKey('codigoProducto', 'ELE-1')
+        ->toHaveKey('nombreMarca', 'Shineray')
+        ->toHaveKey('nombreSubsistema', 'ELECTRICO')
+        ->toHaveKey('nivel1', 'REPUESTOS')
+        ->toHaveKey('codNivel1', 'N1')
+        ->toHaveKey('anioDesde', 2018)
+        ->toHaveKey('isB2b', true)
+        ->toHaveKey('isLandingPromo', false)
+        ->toHaveKey('OldPrice', 2000)
+        ->toHaveKey('hasStock', true);
+    expect((new Product)->searchableAs())->toBe('products');
+});

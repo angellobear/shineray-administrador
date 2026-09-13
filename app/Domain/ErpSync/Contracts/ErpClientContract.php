@@ -14,18 +14,23 @@ use Illuminate\Support\Collection;
 
 /**
  * Único cliente del ERP Shineray/Massline. Unifica catálogo, B2B y
- * facturación (hoy repartidos en tres archivos con lógica de token duplicada).
- * El manejo de token/autenticación vive dentro de la implementación.
+ * facturación (hoy repartidos en cuatro archivos con lógica de token
+ * duplicada). El manejo de token/autenticación vive dentro de la implementación.
  */
 interface ErpClientContract
 {
-    /** @return Collection<int, ErpProduct> Ya deduplicado por SKU. */
-    public function fetchProducts(): Collection;
+    /**
+     * Catálogo completo, ya deduplicado por SKU (primera fila gana).
+     *
+     * @param  bool  $withStock  Consulta stock por SKU (en lotes). El sync de imágenes lo omite.
+     * @return Collection<int, ErpProduct>
+     */
+    public function fetchProducts(bool $withStock = true): Collection;
 
     /** @return Collection<int, ErpClientB2b> */
     public function fetchClientsB2b(): Collection;
 
-    /** @return Collection<int, ErpPolicyB2b> */
+    /** @return Collection<int, ErpPolicyB2b> Una entrada por (cliente, número de cuotas). */
     public function fetchPoliciesB2b(): Collection;
 
     /** @return Collection<int, ErpTransportistaB2b> */
@@ -33,9 +38,30 @@ interface ErpClientContract
 
     public function checkStock(string $sku): StockResult;
 
-    public function getInfoClient(string $idClient): ?ClientInfo;
+    /**
+     * @param  list<string>  $skus
+     * @return array<string, StockResult> Indexado por SKU.
+     */
+    public function checkStockMany(array $skus): array;
+
+    /** `null` cuando el ERP responde `estado = "NO REGISTRADO"`. */
+    public function getInfoClient(int $idType, string $id): ?ClientInfo;
 
     public function saveInfoClient(ClientInfo $client): void;
 
     public function saveInvoice(InvoicePayload $payload): InvoiceResult;
+
+    /**
+     * SKUs recomendados para un cliente B2B (`parts_ecommerce_recomended_b2b`).
+     *
+     * @return list<string>
+     */
+    public function fetchRecommendedSkusB2b(string $ruc): array;
+
+    /**
+     * Deuda/pedidos a crédito de un cliente B2B (`get_client_orders_ecommerce`).
+     *
+     * @return array<string, mixed>
+     */
+    public function fetchCreditDebt(string $ruc): array;
 }

@@ -36,6 +36,10 @@ class ErpSyncRun extends Model
             'type' => $type,
             'status' => ErpSyncRunStatus::Running,
             'started_at' => now(),
+            'fetched_count' => 0,
+            'created_count' => 0,
+            'updated_count' => 0,
+            'unpublished_count' => 0,
         ]);
     }
 

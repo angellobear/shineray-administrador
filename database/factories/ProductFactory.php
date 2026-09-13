@@ -29,10 +29,13 @@ class ProductFactory extends Factory
             'thumbnail' => null,
             'images' => [],
             'status' => ProductStatus::Published,
+            // Mismas claves (en mayúsculas) que manda el ERP.
             'metadata' => [
-                'cod_producto' => strtoupper(fake()->bothify('??####')),
-                'codigo_marca' => 'SHINERAY',
-                'nombre_categoria' => fake()->randomElement(['MOTOR', 'FRENOS', 'SUSPENSION', 'ELECTRICO']),
+                'COD_PRODUCTO' => strtoupper(fake()->bothify('??####')),
+                'CODIGO_MARCA' => 'SHINERAY',
+                'NOMBRE_MARCA' => 'Shineray',
+                'NOMBRE_CATEGORIA' => fake()->randomElement(['CONJUNTO DE MOTOR', 'SISTEMA DE FRENO', 'SISTEMA DE LUCES', 'AROS']),
+                'NIVEL_1' => 'REPUESTOS',
             ],
             'erp_synced_at' => now(),
         ];
