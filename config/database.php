@@ -99,6 +99,22 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        // Base de Medusa v1 (solo lectura) para el ETL de corte: `migrate:legacy-data`.
+        'legacy' => [
+            'driver' => env('LEGACY_DB_DRIVER', 'pgsql'),
+            'url' => env('LEGACY_DB_URL'),
+            'host' => env('LEGACY_DB_HOST', '127.0.0.1'),
+            'port' => env('LEGACY_DB_PORT', '5432'),
+            'database' => env('LEGACY_DB_DATABASE', 'medusa'),
+            'username' => env('LEGACY_DB_USERNAME', 'readonly'),
+            'password' => env('LEGACY_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => env('LEGACY_DB_SCHEMA', 'public'),
+            'sslmode' => env('LEGACY_DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
