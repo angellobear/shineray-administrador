@@ -20,12 +20,12 @@ línea del código Node actual.
   en producción — es la fuente de verdad de "qué debe hacer" cada pieza.
 - **Destino (donde se escribe código nuevo)**: `angellobear/shineray-administrador`.
   Vacío al día de escribir esto. Aquí vive el backend Laravel nuevo y esta
-  carpeta `docs/migracion/`.
+  carpeta `plan-migracion-laravel/`.
 
 **Regla para cualquier agente que trabaje en un módulo**: no cargues los dos
 repos completos en contexto. Para implementar un módulo:
 1. Lee este archivo (`00-lineamientos.md`) una sola vez, al empezar.
-2. Lee el archivo del módulo específico en `docs/migracion/modulos/`.
+2. Lee el archivo del módulo específico en `plan-migracion-laravel/modulos/`.
 3. Abre **solo** los archivos de referencia que ese módulo lista explícitamente
    dentro de `medusa-shineray` (con ruta y, cuando aplica, número de línea) —
    no explores el resto del repo Node salvo que el módulo te lo pida.

@@ -146,3 +146,78 @@ El frontend Next.js seguirá funcionando solo si la API nueva expone formas de
 datos compatibles (o el frontend se adapta en paralelo). Este plan no cubre
 cambios al frontend — se menciona aquí únicamente como dependencia a
 coordinar antes del corte de producción (ver `05-migracion-datos-corte.md`).
+
+## Decisiones tomadas al arrancar la Fase 0 (2026-09-13)
+
+Estas decisiones ajustan lo escrito arriba a lo que ya existe en el repo
+(starter kit Laravel 13 + Inertia React + shadcn/ui + Fortify) y quedan
+implementadas en código. Si se quiere revertir alguna, discutirlo antes de
+construir encima.
+
+1. **Panel de administración en Inertia + React, no Filament.** El repo se
+   scaffoldeó con Inertia React, shadcn/ui, Tailwind 4 y Fortify (login, 2FA,
+   passkeys). Meter Filament añadiría una segunda stack de frontend (Livewire
+   + Blade) al mismo proyecto. El admin se construye con las mismas páginas
+   React del starter, apoyándose en paquetes para no partir de cero:
+   `@tanstack/react-table` para tablas/filtros, `spatie/laravel-query-builder`
+   para listados filtrables por URL, exportación CSV con `league/csv`, y
+   `spatie/laravel-permission` solo si se necesitan roles de staff.
+   Costo aceptado: más trabajo manual que Filament en CRUDs simples.
+2. **Modelos Eloquent en `app/Models` (planos), dominio en `app/Domain`.**
+   Los modelos son compartidos entre dominios (una `Order` la usan Pagos,
+   Envíos, Notificaciones y ERP), y toda la tooling de Laravel (`make:model`,
+   factories, Boost, Fortify, Wayfinder) asume `app/Models`. Lo que sí vive
+   por dominio es el comportamiento: `app/Domain/<Dominio>/{Contracts, DTOs,
+   Services, Gateways|Providers|Clients, Jobs}`. Eventos y listeners en
+   `app/Events` / `app/Listeners`. Enums en `app/Enums`.
+3. **Dos modelos de identidad: `User` (staff) y `Customer` (clientes).**
+   `User` + Fortify + guard `web` para el panel; `Customer` + guard `customer`
+   + Sanctum (cookie SPA o token) para el storefront Next.js. Broker de
+   password reset separado (`customer_password_reset_tokens`).
+4. **`integration_logs` en vez de `payment_logs`.** Una sola tabla polimórfica
+   (`loggable` → Payment/Order/Shipment) etiquetada por `integration`
+   (datafast, deuna, servientrega, shineray_erp, meilisearch) y `event`.
+   Cubre el requisito de "loguear antes de aplicar fallback" de Servientrega
+   sin una segunda tabla.
+5. **`erp_sync_runs`**: bitácora de cada corrida de sync (conteos, estado,
+   error). Da visibilidad al botón "Sincronizar ahora" del admin y deja
+   evidencia cuando la guarda "feed con < 50 productos → no despublicar" actúa.
+6. **Catálogo 1:1 producto→variante.** No se crean `product_options` /
+   `product_variant_options`. `product_variants` existe para que carrito y
+   órdenes referencien SKU/precio; `Product::variant()` da acceso directo.
+   Si negocio confirma variantes reales, se agrega la capa después.
+7. **`status = draft` es visibilidad controlada por el ERP; `deleted_at` es
+   borrado manual desde el admin.** Son dos conceptos distintos, no se
+   mezclan. Scout indexa solo `published` y no borrados (`shouldBeSearchable`).
+8. **IDs**: bigint interno en todo; `carts.public_id` (ULID) y
+   `orders.order_number` son las claves expuestas en URLs/API. Nunca se
+   expone el bigint de carritos u órdenes al storefront.
+9. **Idempotencia de pagos**: `payments (gateway, gateway_reference)` es único.
+   Un webhook repetido de DeUna/OPPWa no puede crear dos pagos.
+10. **Contratos** (`03-contratos.md`) implementados con stubs `Unconfigured*`
+    que lanzan `IntegrationNotImplementedException`; el binding vive en
+    `IntegrationsServiceProvider`. `PaymentGatewayResolver` mapea el enum
+    `PaymentGateway` a su implementación (cinco gateways, un contrato).
+    `ShippingProviderContract::createGuide()` recibe un DTO
+    (`ShippingGuideRequest`), no la `Order`, por la misma razón que `quote()`.
+11. **DTOs como `final readonly class` nativas**, sin `spatie/laravel-data`.
+    Menos dependencias y PHPStan nivel 7 los tipa completos.
+12. **Paquetes instalados en Fase 0**: `laravel/sanctum`, `laravel/scout`,
+    `meilisearch/meilisearch-php`, `laravel/horizon`. Config de índice
+    `products` ya en `config/scout.php` (`hasStock:desc` antes de las reglas
+    por defecto). `SCOUT_DRIVER=null` en tests, `collection` en local sin
+    Meilisearch.
+13. **`config/shineray.php`** centraliza IVA, moneda, reglas de envío (peso
+    mínimo 2 kg, peso por defecto 1 kg, origen Guayaquil, envío gratis $4.30,
+    fallback de cotización $5.00), remitente, crons de sync, intervalos de
+    carrito abandonado y BCC de `order.placed`. `App\Support\TaxCalculator`
+    es el único lugar donde se calcula IVA. Todas las credenciales en
+    `config/services.php` vía `env()`.
+
+### Pendiente inmediato (Fase 1)
+
+- Verificar línea por línea contra el repo Node (esta sesión no tuvo acceso
+  al repo `medusa-shineray`; los hallazgos del plan se tomaron como dados).
+- `ShinerayErpClient::fetchProducts()` + `SyncProductsJob` con fixture real
+  de `/api/all_parts`.
+- Completar `Product::toSearchableArray()` con taxonomía y `deriveSubsistema`.

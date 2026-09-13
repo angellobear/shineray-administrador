@@ -35,4 +35,43 @@ return [
         ],
     ],
 
+    'datafast' => [
+        'base_url' => env('DATAFAST_BASE_URL', 'https://eu-test.oppwa.com'),
+        'entity_id' => env('DATAFAST_ENTITY_ID'),
+        'entity_id_b2b' => env('DATAFAST_ENTITY_ID_B2B'),
+        'bearer_token' => env('DATAFAST_BEARER_TOKEN'),
+        'shopper_mid' => env('DATAFAST_SHOPPER_MID'),
+        'shopper_tid' => env('DATAFAST_SHOPPER_TID'),
+        'shopper_eci' => env('DATAFAST_SHOPPER_ECI'),
+        'shopper_pserv' => env('DATAFAST_SHOPPER_PSERV'),
+        'timeout' => (int) env('DATAFAST_TIMEOUT', 30),
+    ],
+
+    'deuna' => [
+        'base_url' => env('DEUNA_BASE_URL'),
+        'api_key' => env('DEUNA_API_KEY'),
+        'point_of_sale' => env('DEUNA_POINT_OF_SALE'),
+        'webhook_secret' => env('DEUNA_WEBHOOK_SECRET'),
+        'timeout' => (int) env('DEUNA_TIMEOUT', 30),
+    ],
+
+    'servientrega' => [
+        'quote_url' => env('SERVIENTREGA_QUOTE_URL'),
+        'quote_user' => env('SERVIENTREGA_QUOTE_USER'),
+        'quote_password' => env('SERVIENTREGA_QUOTE_PASSWORD'),
+        'quote_token' => env('SERVIENTREGA_QUOTE_TOKEN'),
+        'guide_url' => env('SERVIENTREGA_GUIDE_URL'),
+        'guide_login' => env('SERVIENTREGA_GUIDE_LOGIN'),
+        'guide_password' => env('SERVIENTREGA_GUIDE_PASSWORD'),
+        'timeout' => (int) env('SERVIENTREGA_TIMEOUT', 30),
+    ],
+
+    'shineray_erp' => [
+        'base_url' => env('SHINERAY_ERP_BASE_URL'),
+        'username' => env('SHINERAY_ERP_USERNAME'),
+        'password' => env('SHINERAY_ERP_PASSWORD'),
+        'token_ttl_seconds' => (int) env('SHINERAY_ERP_TOKEN_TTL', 0),
+        'timeout' => (int) env('SHINERAY_ERP_TIMEOUT', 60),
+    ],
+
 ];
