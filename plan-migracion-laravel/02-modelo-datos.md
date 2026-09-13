@@ -110,9 +110,11 @@ se omiten estas dos tablas y `product_variants` es 1:1 con `products`.
 - `id`, `client_b2b_id` FK (**corrige** el `cod_cliente varchar` suelto de
   hoy, que no es una FK real), `es_activo` (boolean), `factor_credito`
   (decimal), `num_cuotas` (integer)
-- **Varias por cliente**: el ERP manda `cuotas_info[]` con una política por
-  número de cuotas. Único `(client_b2b_id, num_cuotas)`. Ver
-  `07-verificacion-codigo.md`.
+- **Corrección verificada**: `cod_cliente`/`COD_CLIENTEH` es el *tipo* de
+  cliente (`type_client`, ej. `DM`), no un cliente. Implementado como
+  `b2b_policies(client_type, is_active, credit_factor, installments)` con único
+  `(client_type, installments)` y sin FK a clientes; `B2bClient` resuelve sus
+  políticas por `type_client` (alias `DI → DM`). Ver `07-verificacion-codigo.md`.
 
 **`transportistas_b2b`**
 - `id`, `razon_social`, `ruc`

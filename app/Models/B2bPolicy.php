@@ -4,32 +4,48 @@ namespace App\Models;
 
 use Database\Factories\B2bPolicyFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * Política de crédito de un cliente B2B (factor de crédito y cuotas).
+ * Política de crédito por TIPO de cliente B2B (factor de crédito y cuotas).
+ * `client_type` es el `COD_CLIENTEH` del ERP; el alias histórico `DI` se
+ * consulta como `DM` (ver `B2bClient::policyType()`).
  *
  * @property int $id
- * @property int $b2b_client_id
+ * @property string $client_type
  * @property bool $is_active
  * @property float $credit_factor
  * @property int $installments
  * @property Carbon|null $erp_synced_at
- * @property-read B2bClient $client
  */
-#[Fillable(['b2b_client_id', 'is_active', 'credit_factor', 'installments', 'erp_synced_at'])]
+#[Fillable(['client_type', 'is_active', 'credit_factor', 'installments', 'erp_synced_at'])]
 class B2bPolicy extends Model
 {
     /** @use HasFactory<B2bPolicyFactory> */
     use HasFactory;
 
-    /** @return BelongsTo<B2bClient, $this> */
-    public function client(): BelongsTo
+    /**
+     * @param  Builder<B2bPolicy>  $query
+     * @return Builder<B2bPolicy>
+     */
+    #[Scope]
+    protected function forClientType(Builder $query, string $clientType): Builder
     {
-        return $this->belongsTo(B2bClient::class, 'b2b_client_id');
+        return $query->where('client_type', B2bClient::normalizePolicyType($clientType));
+    }
+
+    /**
+     * @param  Builder<B2bPolicy>  $query
+     * @return Builder<B2bPolicy>
+     */
+    #[Scope]
+    protected function active(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
     }
 
     /**

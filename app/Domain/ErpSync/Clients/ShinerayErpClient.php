@@ -126,7 +126,7 @@ final class ShinerayErpClient implements ErpClientContract
 
                 foreach (is_array($row['cuotas_info'] ?? null) ? $row['cuotas_info'] : [] as $cuota) {
                     $policies[] = new ErpPolicyB2b(
-                        idClient: (string) $row['COD_CLIENTEH'],
+                        clientType: (string) $row['COD_CLIENTEH'],
                         isActive: filter_var($cuota['es_activo'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         creditFactor: (float) ($cuota['factor_credito'] ?? 0),
                         installments: (int) ($cuota['num_cuotas'] ?? 1),

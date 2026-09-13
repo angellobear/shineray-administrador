@@ -41,23 +41,23 @@ test('every model can be persisted through its factory against the schema', func
     ErpSyncRun::class,
 ]);
 
-test('a B2B client links to its customer and credit policies through real foreign keys', function () {
-    $client = B2bClient::factory()->forCustomer()->create();
-    B2bPolicy::factory()->for($client, 'client')->create(['installments' => 3]);
-    B2bPolicy::factory()->for($client, 'client')->create(['installments' => 6, 'is_active' => false]);
+test('a B2B client links to its customer and resolves the credit policies of its type', function () {
+    $client = B2bClient::factory()->forCustomer()->create(['type_client' => 'DI']);
+    B2bPolicy::factory()->create(['client_type' => 'DM', 'installments' => 3]);
+    B2bPolicy::factory()->create(['client_type' => 'DM', 'installments' => 6, 'is_active' => false]);
+    B2bPolicy::factory()->create(['client_type' => 'MY', 'installments' => 3]);
 
     expect($client->fresh())
         ->customer->toBeInstanceOf(Customer::class)
-        ->policies->toHaveCount(2)
-        ->activePolicies->toHaveCount(1);
+        ->policyType()->toBe('DM')
+        ->activePolicies()->toHaveCount(1);
     expect($client->customer->b2bClient->is($client))->toBeTrue();
 });
 
-test('rejects two policies with the same installments for one client', function () {
-    $client = B2bClient::factory()->create();
-    B2bPolicy::factory()->for($client, 'client')->create(['installments' => 3]);
+test('rejects two policies with the same installments for one client type', function () {
+    B2bPolicy::factory()->create(['client_type' => 'DM', 'installments' => 3]);
 
-    expect(fn () => B2bPolicy::factory()->for($client, 'client')->create(['installments' => 3]))
+    expect(fn () => B2bPolicy::factory()->create(['client_type' => 'DM', 'installments' => 3]))
         ->toThrow(QueryException::class);
 });
 

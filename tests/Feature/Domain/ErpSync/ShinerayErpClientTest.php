@@ -120,18 +120,18 @@ test('flattens one credit policy per installments option', function () {
     Http::fake([
         'erp.test/get-token' => Http::response('"tok-1"'),
         'erp.test/api/politicas_b2b_ecommerce' => Http::response([
-            ['COD_CLIENTEH' => 'RUC1', 'cuotas_info' => [
+            ['COD_CLIENTEH' => 'DM', 'cuotas_info' => [
                 ['es_activo' => 1, 'factor_credito' => '1.0500', 'num_cuotas' => 3],
                 ['es_activo' => 0, 'factor_credito' => '1.1000', 'num_cuotas' => 6],
             ]],
-            ['COD_CLIENTEH' => 'RUC2', 'cuotas_info' => []],
+            ['COD_CLIENTEH' => 'DP', 'cuotas_info' => []],
         ]),
     ]);
 
     $policies = app(ErpClientContract::class)->fetchPoliciesB2b();
 
     expect($policies)->toHaveCount(2);
-    expect($policies[0])->idClient->toBe('RUC1')->isActive->toBeTrue()->creditFactor->toBe(1.05)->installments->toBe(3);
+    expect($policies[0])->clientType->toBe('DM')->isActive->toBeTrue()->creditFactor->toBe(1.05)->installments->toBe(3);
     expect($policies[1])->isActive->toBeFalse()->installments->toBe(6);
 });
 

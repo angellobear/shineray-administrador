@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\B2b\Exceptions\B2bException;
 use App\Domain\Cart\Exceptions\CartException;
 use App\Domain\Payments\Exceptions\PaymentFailedException;
 use App\Domain\Payments\Exceptions\PaymentGatewayException;
@@ -36,6 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (CartException $exception, Request $request) => response()->json([
             'message' => $exception->getMessage(),
         ], 422));
+
+        $exceptions->render(fn (B2bException $exception, Request $request) => response()->json([
+            'message' => $exception->getMessage(),
+        ], $exception->status));
 
         $exceptions->render(fn (PaymentGatewayException $exception, Request $request) => response()->json([
             'message' => $exception->getMessage(),

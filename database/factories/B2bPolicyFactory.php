@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\B2bClient;
 use App\Models\B2bPolicy;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,7 +18,7 @@ class B2bPolicyFactory extends Factory
     public function definition(): array
     {
         return [
-            'b2b_client_id' => B2bClient::factory(),
+            'client_type' => fake()->randomElement(['DM', 'DP', 'MY']),
             'is_active' => true,
             'credit_factor' => fake()->randomFloat(4, 0.5, 2),
             'installments' => fake()->numberBetween(1, 12),

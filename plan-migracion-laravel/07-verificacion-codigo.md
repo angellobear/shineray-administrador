@@ -11,7 +11,7 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
 
 | Tema | Plan decía | Código real | Acción |
 | --- | --- | --- | --- |
-| Políticas B2B | `ClientB2b hasOne PolicyB2b` | El ERP manda `cuotas_info[]`: **varias políticas por cliente**, una por número de cuotas | `b2b_policies` es `hasMany`, único `(b2b_client_id, installments)` |
+| Políticas B2B | `ClientB2b hasOne PolicyB2b` con FK | `COD_CLIENTEH` es el **tipo** de cliente (`type_client`, ej. `DM`), no el cliente; `get-cuota-b2b` consulta por tipo con alias `DI → DM`; `cuotas_info[]` trae una política por número de cuotas | `b2b_policies(client_type, installments)` sin FK a clientes; `B2bClient::activePolicies()` resuelve el alias |
 | Carrito abandonado | "portar los intervalos reales" | `options_.intervals = []` hardcodeado y el constructor ignora las opciones del plugin: **el cron sale sin hacer nada**; solo funciona el envío manual desde el admin | Config `intervals_minutes` vacío por defecto + decisión de negocio pendiente |
 | Precio ERP | `round(PRECIO/1.15*100)` | `round(round(round(PRECIO,2)/1.15,2)*100)` (doble redondeo) | `TaxCalculator::erpGrossPriceToNetCents` replica la cadena exacta |
 | Cotización Servientrega | flete → centavos | flete → centavos **+ 15% IVA** (`valorFinalAddIva`), timeout 6 s, fallback $5.00 sin log | `shipping.quote.add_iva = true` |
@@ -161,8 +161,9 @@ El plan es fiel al código en lo estructural. Las correcciones importantes:
   `{transportistas:[{RAZON_SOCIAL, RUC}]}`; `get_client_orders_ecommerce/{ruc}`
   (deuda); `parts_ecommerce_recomended_b2b` → `[{COD_PERSONA, COD_PRODUCTO}]`
   (recomendados = filtro simple por RUC, sin lógica adicional).
-- `get-cuota-b2b`: si `cod_cliente === "DI"` se consulta como `"DM"`
-  (alias de tipo de cliente; documentar en `B2bPolicy`).
+- `get-cuota-b2b`: recibe `cod_cliente` = `customer.metadata.cod_client` = `type_client` del
+  cliente B2B; si es `"DI"` consulta `"DM"`. Es decir, las políticas son **por tipo de cliente**
+  (implementado en `B2bClient::normalizePolicyType()`).
 - `client-b2b-verify`: password fijo `shineray2024` (hash scrypt) **y además**
   envía email de reset de contraseña. En Laravel: `Customer.password = null`
   + invitación con token de reset; no hace falta el hash fijo.

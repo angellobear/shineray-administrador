@@ -32,16 +32,16 @@ return new class extends Migration
 
         Schema::create('b2b_policies', function (Blueprint $table) {
             $table->id();
-            // FK real (reemplaza el `cod_cliente varchar` suelto). Un cliente tiene
-            // varias políticas: el ERP manda una fila de `cuotas_info` por número de cuotas.
-            $table->foreignId('b2b_client_id')->constrained('b2b_clients')->cascadeOnDelete();
+            // El ERP indexa las políticas por TIPO de cliente (`COD_CLIENTEH`, ej. "DM"),
+            // que es el `type_client` de b2b_clients, con una fila por número de cuotas.
+            $table->string('client_type', 30);
             $table->boolean('is_active')->default(true);
             $table->decimal('credit_factor', 10, 4)->default(0);
             $table->unsignedInteger('installments')->default(1);
             $table->timestamp('erp_synced_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['b2b_client_id', 'installments']);
+            $table->unique(['client_type', 'installments']);
         });
 
         Schema::create('b2b_transportistas', function (Blueprint $table) {

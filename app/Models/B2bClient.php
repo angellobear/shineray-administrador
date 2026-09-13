@@ -40,20 +40,42 @@ class B2bClient extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    /** Alias histórico del ERP: los clientes "DI" usan las políticas de "DM". */
+    private const POLICY_TYPE_ALIASES = ['DI' => 'DM'];
+
+    public static function normalizePolicyType(string $clientType): string
+    {
+        return self::POLICY_TYPE_ALIASES[$clientType] ?? $clientType;
+    }
+
+    /** Tipo bajo el que se buscan las políticas de crédito de este cliente. */
+    public function policyType(): ?string
+    {
+        return $this->type_client === null ? null : self::normalizePolicyType($this->type_client);
+    }
+
     /**
-     * Políticas de crédito: una por número de cuotas (`cuotas_info` del ERP).
+     * Políticas de crédito del tipo de cliente: una por número de cuotas.
      *
      * @return HasMany<B2bPolicy, $this>
      */
     public function policies(): HasMany
     {
-        return $this->hasMany(B2bPolicy::class);
+        return $this->hasMany(B2bPolicy::class, 'client_type', 'type_client');
     }
 
-    /** @return HasMany<B2bPolicy, $this> */
-    public function activePolicies(): HasMany
+    /**
+     * Políticas activas resolviendo el alias de tipo (DI → DM).
+     *
+     * @return Collection<int, B2bPolicy>
+     */
+    public function activePolicies(): Collection
     {
-        return $this->policies()->where('is_active', true);
+        $type = $this->policyType();
+
+        return $type === null
+            ? new Collection
+            : B2bPolicy::query()->forClientType($type)->active()->orderBy('installments')->get();
     }
 
     /**

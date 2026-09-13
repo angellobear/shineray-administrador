@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomerResetPasswordNotification;
 use Database\Factories\CustomerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -62,6 +63,16 @@ class Customer extends Authenticatable
     public function b2bClient(): HasOne
     {
         return $this->hasOne(B2bClient::class);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new CustomerResetPasswordNotification($token));
+    }
+
+    public function hasAccount(): bool
+    {
+        return $this->password !== null;
     }
 
     public function fullName(): string
